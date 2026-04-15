@@ -12,6 +12,8 @@ class Event extends Model
     'event_date',
     'location',
     'capacity',
+    'status',
+    'user_id',
 ];
 }
 

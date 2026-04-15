@@ -18,6 +18,8 @@ return new class extends Migration
             $table->dateTime('event_date');
             $table->string('location');
             $table->integer('capacity');
+            $table->enum('status',['pending','approved','rejected']);
+            $table->foreignId('user_id')->constrained();
             $table->timestamps();
         });
     }

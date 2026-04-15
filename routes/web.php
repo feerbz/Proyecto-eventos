@@ -4,6 +4,8 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventController;
 
+Route::get('/events',[EventController::class,'index']);
+
 Route::post('/events', [EventController::class, 'store'])->middleware('auth');
 
 Route::get('/', function () {

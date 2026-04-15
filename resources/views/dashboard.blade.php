@@ -9,8 +9,9 @@
         {{session('success')}}
 </div>
 @endif
-    <form method="POST" action="/events">
+    <form method="POST" action="{{('/events')}}">
     @csrf 
+    
     <input type="text" name ="title" placeholder ="Título"><br>
     <textarea name="description" placeholder="Descripción"></textarea><br>
     <input type="datetime-local" name="event_date"><br>
