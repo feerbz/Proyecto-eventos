@@ -198,6 +198,12 @@ public function unregister($id)
 
     return back()->with('success', 'Te diste de baja del evento');
 }
-
+public function show(Event $event)
+{
+    // Solo cargamos el conteo de inscritos para evitar errores de relación
+    $event->loadCount('registrations');
+    
+    return view('events.show', compact('event'));
+}
 }
 
