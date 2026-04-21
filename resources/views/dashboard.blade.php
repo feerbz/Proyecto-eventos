@@ -1,75 +1,113 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2>Eventos disponibles</h2>
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h2 class="font-black text-2xl text-gray-800 dark:text-white tracking-tighter">
+                    Cartelera <span class="text-emerald-600">Universitaria</span>
+                </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                    Descubre los próximos eventos en tu comunidad.
+                </p>
+            </div>
+
+            <a href="/events/create"
+               class="inline-flex items-center justify-center px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg">
+                + Proponer Evento
+            </a>
+        </div>
     </x-slot>
 
-    {{-- Mensajes --}}
+    {{-- MENSAJES --}}
     @if (session('success'))
-        <div style="color: green;">
+        <div class="max-w-7xl mx-auto px-4 mt-6 text-green-600 font-bold">
             {{ session('success') }}
         </div>
     @endif
 
     @if (session('error'))
-        <div style="color: red;">
+        <div class="max-w-7xl mx-auto px-4 mt-6 text-red-600 font-bold">
             {{ session('error') }}
         </div>
     @endif
 
-    <p>Total eventos: {{ count($events) }}</p>
+    <div class="py-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-    {{-- Lista de eventos --}}
-    @foreach ($events as $event)
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-        @php
-            $inscrito = \App\Models\Registration::where('user_id', auth()->id())
-                ->where('event_id', $event->id)
-                ->exists();
+                @forelse ($events as $event)
 
-            $total = \App\Models\Registration::where('event_id', $event->id)->count();
-        @endphp
+                    @php
+                        $inscrito = \App\Models\Registration::where('user_id', auth()->id())
+                            ->where('event_id', $event->id)
+                            ->exists();
 
-        <div style="border:1px solid #ccc; margin:10px; padding:10px;">
-            <h3>{{ $event->title }}</h3>
-            <p>{{ $event->description }}</p>
-            <p><strong>Fecha:</strong> {{ $event->event_date }}</p>
-            <p><strong>Lugar:</strong> {{ $event->location }}</p>
+                        $total = \App\Models\Registration::where('event_id', $event->id)->count();
+                    @endphp
 
-            {{-- Cupo --}}
-            <p>
-                Cupo: {{ $total }} / {{ $event->capacity }}
-            </p>
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 flex flex-col">
 
-            {{-- Estado --}}
-            @if($inscrito)
+                        <span class="text-xs font-bold text-emerald-600 mb-2">
+                            {{ $event->location }}
+                        </span>
 
-                <span style="background: green; color: white; padding: 5px 10px; border-radius: 5px;">
-                    Inscrito
-                </span>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">
+                            {{ $event->title }}
+                        </h3>
 
-                <form method="POST" action="/events/{{ $event->id }}/unregister">
-                    @csrf
-                    @method('DELETE')
-                    <button onclick="return confirm('¿Cancelar inscripción?')">
-                        Cancelar inscripción
-                    </button>
-                </form>
+                        <p class="text-sm text-gray-500 mb-4">
+                            {{ $event->description }}
+                        </p>
 
-            @elseif($total >= $event->capacity)
+                        <p class="text-sm mb-2">
+                        {{ \Carbon\Carbon::parse($event->event_date)->format('d M Y h:i A') }}
+                        </p>
 
-                <p style="color:red;">Evento lleno</p>
+                        <p class="text-sm mb-4">
+                        Cupo: {{ $total }} / {{ $event->capacity }}
+                        </p>
 
-            @else
+                        {{-- BOTONES --}}
+                        @if($inscrito)
 
-                <form method="POST" action="/events/{{ $event->id }}/register">
-                    @csrf
-                    <button>Inscribirme</button>
-                </form>
+                            <span class="text-green-600 font-bold mb-2">
+                                Inscrito
+                            </span>
 
-            @endif
+                            <form method="POST" action="/events/{{ $event->id }}/unregister">
+                                @csrf
+                                @method('DELETE')
+                                <button class="w-full bg-red-500 text-white py-2 rounded"
+                                    onclick="return confirm('¿Cancelar inscripción?')">
+                                    Cancelar inscripción
+                                </button>
+                            </form>
+
+                        @elseif($total >= $event->capacity)
+
+                            <span class="text-red-500 font-bold">
+                                Evento lleno
+                            </span>
+
+                        @else
+
+                            <form method="POST" action="/events/{{ $event->id }}/register">
+                                @csrf
+                                <button class="w-full bg-emerald-600 text-white py-2 rounded">
+                                    Inscribirme
+                                </button>
+                            </form>
+
+                        @endif
+
+                    </div>
+
+                @empty
+                    <p>No hay eventos disponibles</p>
+                @endforelse
+
+            </div>
 
         </div>
-
-    @endforeach
-
+    </div>
 </x-app-layout>
