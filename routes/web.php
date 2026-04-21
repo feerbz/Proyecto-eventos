@@ -9,6 +9,7 @@ Route::post('/events', [EventController::class, 'store'])->middleware('auth');
 
 Route::post('/events/{id}/approve', [EventController::class, 'approve'])->middleware('auth');
 Route::post('/events/{id}/reject', [EventController::class, 'reject'])->middleware('auth');
+Route::delete('/events/{id}/unregister', [EventController::class, 'unregister'])->middleware('auth');
 
 Route::get('/', function () {
     return view('welcome');
@@ -33,5 +34,6 @@ Route::get('/events/pending', [EventController::class, 'pending'])->middleware('
 Route::get('/events/{id}/edit', [EventController::class, 'edit'])->middleware('auth');
 Route::put('/events/{id}', [EventController::class, 'update'])->middleware('auth');
 Route::delete('/events/{id}', [EventController::class, 'destroy'])->middleware('auth');
-
+Route::post('/events/{id}/register',[EventController::class,'register'])->middleware('auth');
+Route::get('/mis-inscripciones',[EventController::class, 'myRegistrations'])->middleware('auth');
 require __DIR__.'/auth.php';

@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use Illuminate\Http\Request;
+use App\Models\Registration;
 
 class EventController extends Controller
 {
     public function feed()
     {
         $events = Event::where('status','approved')
+        ->with('registrations')
         ->orderBy ('event_date','asc')
         ->get();
 
@@ -18,6 +20,7 @@ class EventController extends Controller
 
     public function store(Request $request)
     {
+        
         $request->validate([
             'title' => 'required|string',
             'description' => 'required|string',
@@ -129,7 +132,7 @@ public function update(Request $request, $id)
         'event_date' => $request->event_date,
         'location' => $request->location,
         'capacity' => $request->capacity,
-        'status' => 'pending', // 🔥 CLAVE
+        'status' => 'pending',
     ]);
 
     return redirect('/mis-eventos')->with('success', 'Evento actualizado y enviado a revisión');
@@ -148,8 +151,53 @@ public function destroy($id)
     return back();
 }
 
+public function register($id)
+{
+    $event = Event::findOrFail($id);
 
+    // validar cupo
+    if($event->registrations()->count() >= $event->capacity){
+        return back()->with('error', 'Evento lleno');
+    }
 
+    // evitar doble registro
+    $exist = Registration::where('user_id', auth()->id())
+        ->where('event_id', $id)
+        ->exists();
+
+    if($exist){
+        return back()->with('error','Ya estás registrado');
+    }
+
+    Registration::create([
+        'user_id' => auth()->id(),
+        'event_id' => $id,
+    ]);
+
+    return back()->with('success', 'Te registraste al evento');
+}
+public function myRegistrations()
+{
+    $registrations = \App\Models\Registration::where('user_id', auth()->id())
+        ->with('event')
+        ->get();
+
+    return view('events.my-registrations', compact('registrations'));
+}
+public function unregister($id)
+{
+    $registration = \App\Models\Registration::where('user_id', auth()->id())
+        ->where('event_id', $id)
+        ->first();
+
+    if(!$registration){
+        return back()->with('error', 'No estás inscrito en este evento');
+    }
+
+    $registration->delete();
+
+    return back()->with('success', 'Te diste de baja del evento');
+}
 
 }
 

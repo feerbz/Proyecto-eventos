@@ -9,6 +9,8 @@
         <input type="datetime-local" name="event_date"><br>
         <input type="text" name="location" placeholder="Lugar"><br>
         <input type="number" name="capacity" placeholder="Capacidad"><br>
+        <p>Usuario actual: {{auth()->user()->email}}</p>
+        <p>ID:{{auth()->id()}}</p>
 
         <button type="submit">Crear evento</button>
     </form>

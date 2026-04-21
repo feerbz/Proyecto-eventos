@@ -42,6 +42,9 @@
                     @endif
 
                 </div>
+                <x-nav-link href="/mis-inscripciones">
+                    Mis inscripciones
+</x-nav-link>
 
             </div>
 
