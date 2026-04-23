@@ -15,10 +15,14 @@ COPY . .
 # Instalar dependencias Laravel
 RUN composer install --no-dev --optimize-autoloader
 
+# Crear base de datos SQLite
 RUN mkdir -p /tmp && touch /tmp/database.sqlite
+
+# Permisos (importante)
+RUN chmod -R 777 /tmp
 
 # Exponer puerto
 EXPOSE 10000
 
-# Comando para correr Laravel
-CMD php artisan serve --host=0.0.0.0 --port=10000
+
+CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=10000
