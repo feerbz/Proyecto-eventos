@@ -15,6 +15,8 @@ COPY . .
 # Instalar dependencias Laravel
 RUN composer install --no-dev --optimize-autoloader
 
+RUN mkdir -p /tmp && touch /tmp/database.sqlite
+
 # Exponer puerto
 EXPOSE 10000
 
