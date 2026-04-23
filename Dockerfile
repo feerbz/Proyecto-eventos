@@ -25,4 +25,4 @@ RUN chmod -R 777 /tmp
 EXPOSE 10000
 
 
-CMD mkdir -p /tmp && touch /tmp/database.sqlite && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=10000
+CMD php artisan config:clear && mkdir -p /tmp && touch /tmp/database.sqlite && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=10000
