@@ -11,5 +11,6 @@ ENV NODE_ENV=production
 
 RUN npm ci
 RUN npm run build
+RUN ls -la public/build
 
 RUN ls -la public/build
