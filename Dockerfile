@@ -33,7 +33,6 @@ RUN mkdir -p /tmp && touch /tmp/database.sqlite && chmod 777 /tmp/database.sqlit
 
 # Puerto Render
 EXPOSE 10000
-
 CMD php artisan config:clear && \
     php artisan migrate --force && \
     php artisan db:seed --force && \
