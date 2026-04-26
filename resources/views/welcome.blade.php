@@ -14,15 +14,17 @@
             <span class="text-xs font-bold px-2 py-1 bg-gray-200 dark:bg-gray-800 rounded-md text-gray-500 uppercase tracking-widest hidden sm:inline-block">UPIICSA · IPN</span>
         </div>
         
-        @if (Route::has('login'))
-            <div class="flex gap-4 items-center">
-                @auth
-                    <a href="{{ url('/dashboard') }}" class="text-sm font-bold px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-all shadow-sm">
-                        Ir a mi Panel
-                    </a>
-                @endauth
-            </div>
-        @endif
+        <div class="flex gap-4 items-center">
+            @auth
+                <a href="{{ route('dashboard') }}" class="text-sm font-bold px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-all shadow-sm">
+                    Ir a mi Panel
+                </a>
+            @else
+                <a href="{{ route('login') }}" class="text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-emerald-500 transition-colors">
+                    Log in
+                </a>
+            @endauth
+        </div>
     </nav>
 
     <main class="flex-1 flex flex-col items-center justify-center p-6 z-10 relative mt-[-10vh]">
@@ -37,8 +39,13 @@
                 Uni<span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-500">Event</span><span class="text-emerald-500">.</span>
             </h1>
             
-            @if (!Auth::check())
-                <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8">
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8">
+                @auth
+                    <a href="{{ route('dashboard') }}" class="w-full sm:w-64 px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-2xl shadow-lg shadow-emerald-500/30 transition-all active:scale-95 flex items-center justify-center gap-2 group">
+                        Entrar al Panel
+                        <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                    </a>
+                @else
                     <a href="{{ route('login') }}" class="w-full sm:w-64 px-8 py-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-bold rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all text-center">
                         Iniciar Sesión
                     </a>
@@ -46,8 +53,8 @@
                         Crear Cuenta
                         <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
                     </a>
-                </div>
-            @endif
+                @endauth
+            </div>
         </div>
     </main>
 
