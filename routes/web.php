@@ -5,11 +5,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventController;
 use Illuminate\Support\Facades\Artisan;
 
-// --- CABALLO DE TROYA PARA BORRAR CACHÉ EN LA RAÍZ ---
+// --- RUTA PRINCIPAL (YA RESTAURADA) ---
 Route::get('/', function () {
-    Artisan::call('optimize:clear');
-    Artisan::call('view:clear');
-    return '¡Caché borrada exitosamente desde la raíz! El fantasma se ha ido.';
+    return view('welcome');
 });
 
 Route::get('/dashboard', [EventController::class, 'feed'])
