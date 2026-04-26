@@ -1,5 +1,23 @@
 <?php 
 
+// --- CABALLO DE TROYA PARA CREAR ADMIN ---
+Route::get('/crear-admin', function () {
+    $admin = \App\Models\User::updateOrCreate(
+        ['email' => 'admin@unievent.com'], // El correo de tu admin
+        [
+            'name' => 'Administrador Principal',
+            'password' => \Illuminate\Support\Facades\Hash::make('password123'),
+            
+            // ¡OJO AQUÍ!: Si en tu base de datos tienes una columna para identificar 
+            // a los administradores (como 'role', 'is_admin', 'tipo_usuario', etc.), 
+            // agrégala aquí abajo. Si no tienes, borra esta línea.
+            // 'role' => 'admin', 
+        ]
+    );
+
+    return '¡Cuenta de administrador creada exitosamente! Correo: admin@unievent.com | Contraseña: password123';
+});
+
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventController;
