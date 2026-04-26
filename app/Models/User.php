@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role', // <--- ¡AQUÍ ESTÁ EL PERMISO QUE FALTABA!
     ];
 
     /**
