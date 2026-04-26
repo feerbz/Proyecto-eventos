@@ -1,27 +1,23 @@
 <?php 
 
-// --- CABALLO DE TROYA PARA CREAR ADMIN ---
+use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\EventController;
+use Illuminate\Support\Facades\Artisan;
+
+// --- CABALLO DE TROYA PARA CREAR/ACTUALIZAR ADMIN ---
 Route::get('/crear-admin', function () {
     $admin = \App\Models\User::updateOrCreate(
         ['email' => 'admin@unievent.com'], // El correo de tu admin
         [
             'name' => 'Administrador Principal',
             'password' => \Illuminate\Support\Facades\Hash::make('password123'),
-            
-            // ¡OJO AQUÍ!: Si en tu base de datos tienes una columna para identificar 
-            // a los administradores (como 'role', 'is_admin', 'tipo_usuario', etc.), 
-            // agrégala aquí abajo. Si no tienes, borra esta línea.
-            // 'role' => 'admin', 
+            'role' => 'admin', // <--- ¡LISTO! YA DESCOMENTAMOS LA LLAVE MÁGICA
         ]
     );
 
-    return '¡Cuenta de administrador creada exitosamente! Correo: admin@unievent.com | Contraseña: password123';
+    return '¡Cuenta de administrador actualizada con éxito! Ya tienes el rol de admin.';
 });
-
-use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\EventController;
-use Illuminate\Support\Facades\Artisan;
 
 // --- CABALLO DE TROYA PARA MIGRAR LA BASE DE DATOS ---
 Route::get('/migrar-db', function () {
