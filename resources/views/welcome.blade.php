@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>UniEvent | UPIICSA</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='25' fill='%2310b981'/><text x='50%' y='54%' font-family='sans-serif' font-weight='900' font-size='65' fill='white' dominant-baseline='central' text-anchor='middle'>U</text></svg>">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+   <!-- @vite(['resources/css/app.css', 'resources/js/app.js']) -->
 </head>
 <body class="antialiased bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen flex flex-col relative overflow-x-hidden">
     
