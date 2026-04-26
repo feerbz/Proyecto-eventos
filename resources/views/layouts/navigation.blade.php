@@ -34,7 +34,7 @@
                         Mis eventos
                     </x-nav-link>
 
-                    {{-- 👇 ESTE ES TU LINK (INTEGRADO BIEN) --}}
+                    
                     <x-nav-link href="/mis-inscripciones" :active="request()->is('mis-inscripciones')" class="inline-flex items-center gap-2">
                         Mis inscripciones
                     </x-nav-link>
@@ -85,4 +85,31 @@
             </div>
         </div>
     </div>
+    <!-- Mobile Menu -->
+<div x-show="open" class="sm:hidden px-4 pt-4 pb-2 space-y-2 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+
+    <a href="{{ route('dashboard') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200">
+        Inicio
+    </a>
+
+    <a href="/events/create" class="block px-3 py-2 rounded-md text-base font-medium text-emerald-600">
+        Crear evento
+    </a>
+
+    <a href="/mis-eventos" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200">
+        Mis eventos
+    </a>
+
+    <a href="/mis-inscripciones" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200">
+        Mis inscripciones
+    </a>
+
+    @if(auth()->user()->role === 'admin')
+        <a href="/events/pending" class="block px-3 py-2 rounded-md text-base font-medium text-amber-500">
+            Pendientes
+        </a>
+    @endif
+
+</div>
+
 </nav>
