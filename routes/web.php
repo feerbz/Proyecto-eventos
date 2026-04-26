@@ -3,51 +3,34 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventController;
-use Illuminate\Support\Facades\Artisan;
 
-// --- CABALLO DE TROYA PARA CREAR/ACTUALIZAR ADMIN ---
-Route::get('/crear-admin', function () {
-    $admin = \App\Models\User::updateOrCreate(
-        ['email' => 'admin@unievent.com'], // El correo de tu admin
-        [
-            'name' => 'Administrador Principal',
-            'password' => \Illuminate\Support\Facades\Hash::make('password123'),
-            'role' => 'admin', // <--- ¡LISTO! YA DESCOMENTAMOS LA LLAVE MÁGICA
-        ]
-    );
+/*
+|--------------------------------------------------------------------------
+| UniEvent - Rutas de Producción
+|--------------------------------------------------------------------------
+*/
 
-    return '¡Cuenta de administrador actualizada con éxito! Ya tienes el rol de admin.';
-});
-
-// --- CABALLO DE TROYA PARA MIGRAR LA BASE DE DATOS ---
-Route::get('/migrar-db', function () {
-    // El --force es obligatorio porque estamos en producción
-    \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-    
-    // Si necesitas que se ejecuten tus seeders (para crear tu usuario admin@admin.com) descomenta la siguiente línea:
-    // \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
-    
-    return '¡Base de datos migrada con éxito! Ya puedes iniciar sesión.';
-});
-
-// --- RUTA PRINCIPAL (YA RESTAURADA) ---
+// --- RUTA PRINCIPAL ---
 Route::get('/', function () {
     return view('welcome');
 });
 
+// --- DASHBOARD (FEED DE EVENTOS) ---
 Route::get('/dashboard', [EventController::class, 'feed'])
     ->middleware(['auth'])
     ->name('dashboard');
 
-// --- PANEL DE ADMINISTRACIÓN Y RUTAS FIJAS ---
+// --- RUTAS AUTENTICADAS ---
 Route::middleware('auth')->group(function () {
+    
+    // Panel de Administración (Solo para roles admin)
     Route::get('/events/pending', [EventController::class, 'pending']);
+    
+    // Gestión de Eventos del Usuario
     Route::get('/mis-eventos', [EventController::class, 'myEvents']);
     Route::get('/mis-inscripciones', [EventController::class, 'myRegistrations']);
-});
 
-// --- RUTAS DE EVENTOS (CRUD) ---
-Route::middleware('auth')->group(function () {
+    // CRUD de Eventos
     Route::get('/events', [EventController::class, 'index']);
     Route::get('/events/create', function () { return view('events.create'); });
     Route::post('/events', [EventController::class, 'store']);
@@ -55,18 +38,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/events/{id}/edit', [EventController::class, 'edit']);
     Route::put('/events/{id}', [EventController::class, 'update']);
     Route::delete('/events/{id}', [EventController::class, 'destroy']);
-});
 
-// --- ACCIONES DE FORMULARIO (POST/DELETE) ---
-Route::middleware('auth')->group(function () {
+    // Acciones de Inscripción y Moderación
     Route::post('/events/{id}/register', [EventController::class, 'register']);
     Route::delete('/events/{id}/unregister', [EventController::class, 'unregister']);
     Route::post('/events/{id}/approve', [EventController::class, 'approve']);
     Route::post('/events/{id}/reject', [EventController::class, 'reject']);
-});
 
-// --- PERFIL DE USUARIO ---
-Route::middleware('auth')->group(function () {
+    // Perfil de Usuario
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
