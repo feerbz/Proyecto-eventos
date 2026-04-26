@@ -5,6 +5,17 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventController;
 use Illuminate\Support\Facades\Artisan;
 
+// --- CABALLO DE TROYA PARA MIGRAR LA BASE DE DATOS ---
+Route::get('/migrar-db', function () {
+    // El --force es obligatorio porque estamos en producción
+    \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+    
+    // Si necesitas que se ejecuten tus seeders (para crear tu usuario admin@admin.com) descomenta la siguiente línea:
+    // \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+    
+    return '¡Base de datos migrada con éxito! Ya puedes iniciar sesión.';
+});
+
 // --- RUTA PRINCIPAL (YA RESTAURADA) ---
 Route::get('/', function () {
     return view('welcome');
