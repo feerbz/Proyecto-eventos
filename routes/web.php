@@ -51,3 +51,11 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+use Illuminate\Support\Facades\Artisan;
+
+Route::get('/limpiar', function () {
+    Artisan::call('optimize:clear');
+    Artisan::call('view:clear');
+    return '¡Memoria del servidor borrada por completo!';
+});
