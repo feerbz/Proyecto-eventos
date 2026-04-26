@@ -3,19 +3,21 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventController;
+use Illuminate\Support\Facades\Artisan;
 
-// --- RUTAS PÚBLICAS / DASHBOARD ---
+// --- CABALLO DE TROYA PARA BORRAR CACHÉ EN LA RAÍZ ---
 Route::get('/', function () {
-    return view('welcome');
+    Artisan::call('optimize:clear');
+    Artisan::call('view:clear');
+    return '¡Caché borrada exitosamente desde la raíz! El fantasma se ha ido.';
 });
 
 Route::get('/dashboard', [EventController::class, 'feed'])
     ->middleware(['auth'])
     ->name('dashboard');
 
-// --- PANEL DE ADMINISTRACIÓN Y RUTAS FIJAS (ESTAS VAN PRIMERO) ---
+// --- PANEL DE ADMINISTRACIÓN Y RUTAS FIJAS ---
 Route::middleware('auth')->group(function () {
-    // Movimos esto hacia arriba para que Laravel no lo confunda con un ID
     Route::get('/events/pending', [EventController::class, 'pending']);
     Route::get('/mis-eventos', [EventController::class, 'myEvents']);
     Route::get('/mis-inscripciones', [EventController::class, 'myRegistrations']);
@@ -26,10 +28,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/events', [EventController::class, 'index']);
     Route::get('/events/create', function () { return view('events.create'); });
     Route::post('/events', [EventController::class, 'store']);
-    
-    // Al dejar esta al final de los GET, Laravel solo entrará aquí si no es "pending", "create", etc.
     Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
-    
     Route::get('/events/{id}/edit', [EventController::class, 'edit']);
     Route::put('/events/{id}', [EventController::class, 'update']);
     Route::delete('/events/{id}', [EventController::class, 'destroy']);
@@ -51,11 +50,3 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
-
-use Illuminate\Support\Facades\Artisan;
-
-Route::get('/limpiar', function () {
-    Artisan::call('optimize:clear');
-    Artisan::call('view:clear');
-    return '¡Memoria del servidor borrada por completo!';
-});
