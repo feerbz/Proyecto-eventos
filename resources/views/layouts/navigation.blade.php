@@ -46,6 +46,15 @@
                             </svg>
                             Pendientes
                         </x-nav-link>
+                        @endif
+
+                    @if(auth()->user()->role === 'admin')
+                        <x-nav-link href="/spaces/create" :active="request()->is('spaces/create')" class="inline-flex items-center gap-2 text-amber-500 font-semibold">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path d="M3 7h18M3 12h18M3 17h18" stroke-width="2"/>
+                                    </svg>
+                                    Crear espacio
+                        </x-nav-link>
                     @endif
 
                 </div>
@@ -65,7 +74,7 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">Perfil</x-dropdown-link>
+                        <x-dropdown-link href="/profile">Perfil</x-dropdown-link>
 
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
@@ -109,6 +118,15 @@
             Pendientes
         </a>
     @endif
+@if(auth()->user()->role === 'admin')
+    <a href="/events/pending" class="block px-3 py-2 rounded-md text-base font-medium text-amber-500">
+        Pendientes
+    </a>
+    <a href="/spaces/create" class="block px-3 py-2 rounded-md text-base font-medium text-indigo-500">
+        Crear espacio
+    </a>
+@endif
+
 
 </div>
 

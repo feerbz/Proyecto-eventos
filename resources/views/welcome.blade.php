@@ -10,19 +10,17 @@
 <body class="antialiased bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen flex flex-col relative overflow-x-hidden">
     
     <nav class="w-full p-6 flex justify-between items-center max-w-7xl mx-auto z-10 relative">
-        <div class="font-black text-2xl tracking-tighter flex items-center gap-2">
-            <span class="text-xs font-bold px-2 py-1 bg-gray-200 dark:bg-gray-800 rounded-md text-gray-500 uppercase tracking-widest hidden sm:inline-block">UPIICSA · IPN</span>
-        </div>
-        
-        @if (Route::has('login'))
-            <div class="flex gap-4 items-center">
-                @auth
-                    <a href="{{ url('/dashboard') }}" class="text-sm font-bold px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-all shadow-sm">
-                        Ir a mi Panel
-                    </a>
-                @endauth
-            </div>
-        @endif
+<div class="absolute top-0 right-0 p-6">
+    @auth
+        <a href="{{ url('/dashboard') }}" class="text-sm font-bold text-gray-700 dark:text-gray-200">
+            Dashboard
+        </a>
+    @else
+        <a href="{{ route('login') }}" class="text-sm font-bold text-gray-700 dark:text-gray-200">
+            Acceso
+        </a>
+    @endauth
+</div>
     </nav>
 
     <main class="flex-1 flex flex-col items-center justify-center p-6 z-10 relative mt-[-10vh]">
@@ -37,7 +35,7 @@
                 Uni<span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-500">Event</span><span class="text-emerald-500">.</span>
             </h1>
             
-            @if (!Auth::check())
+            @guest
                 <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8">
                     <a href="{{ route('login') }}" class="w-full sm:w-64 px-8 py-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-bold rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all text-center">
                         Iniciar Sesión
@@ -47,7 +45,7 @@
                         <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
                     </a>
                 </div>
-            @endif
+            @endguest
         </div>
     </main>
 

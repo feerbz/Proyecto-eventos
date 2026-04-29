@@ -28,19 +28,34 @@ class RegisteredUserController extends Controller
      *
      * @throws ValidationException
      */
+    
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
+    'name' => ['required', 'string', 'max:255'],
+    'email' => [
+        'required',
+        'string',
+        'email',
+        'max:255',
+        'unique:users',
+        function ($attribute, $value, $fail) {
+            if (!str_ends_with($value, '.ipn.mx')) {
+                $fail('Solo se permiten correos institucionales.');
+            }
+        },
+    ],
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+    'phone' => ['required', 'string', 'max:10'],
+
+    'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
+]);
+$user = User::create([
+    'name' => $request->name,
+    'email' => $request->email,
+    'phone' => $request->phone,
+    'password' => Hash::make($request->password),
+]);
 
         event(new Registered($user));
 
@@ -48,4 +63,5 @@ class RegisteredUserController extends Controller
 
         return redirect(route('dashboard', absolute: false));
     }
+    
 }

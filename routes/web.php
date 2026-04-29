@@ -1,53 +1,59 @@
-<?php 
+<?php
 
-use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SpaceController;
 
-// --- RUTAS PÚBLICAS / DASHBOARD ---
+Route::middleware('auth')->group(function () {
+    Route::get('/spaces/create', [SpaceController::class, 'create']);
+    Route::post('/spaces', [SpaceController::class, 'store']);
+});
+
+/* ---------------- PUBLICO ---------------- */
 Route::get('/', function () {
     return view('welcome');
 });
 
+/* ---------------- DASHBOARD ---------------- */
 Route::get('/dashboard', [EventController::class, 'feed'])
-    ->middleware(['auth'])
+    ->middleware('auth')
     ->name('dashboard');
 
-// --- PANEL DE ADMINISTRACIÓN Y RUTAS FIJAS (ESTAS VAN PRIMERO) ---
+/* ---------------- EVENTOS ---------------- */
 Route::middleware('auth')->group(function () {
-    // Movimos esto hacia arriba para que Laravel no lo confunda con un ID
+
+    //RUTAS ESPECÍFICAS PRIMERO
     Route::get('/events/pending', [EventController::class, 'pending']);
+
+    Route::get('/events/create', [EventController::class, 'create']);
+    Route::post('/events', [EventController::class, 'store']);
+
+    Route::get('/events', [EventController::class, 'index']);
+
     Route::get('/mis-eventos', [EventController::class, 'myEvents']);
     Route::get('/mis-inscripciones', [EventController::class, 'myRegistrations']);
-});
 
-// --- RUTAS DE EVENTOS (CRUD) ---
-Route::middleware('auth')->group(function () {
-    Route::get('/events', [EventController::class, 'index']);
-    Route::get('/events/create', function () { return view('events.create'); });
-    Route::post('/events', [EventController::class, 'store']);
-    
-    // Al dejar esta al final de los GET, Laravel solo entrará aquí si no es "pending", "create", etc.
-    Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
-    
+    //ACCIONES ADMIN (IMPORTANTE)
+    Route::post('/events/{id}/approve', [EventController::class, 'approve']);
+    Route::post('/events/{id}/reject', [EventController::class, 'reject']);
+
+    //RUTAS DINÁMICAS AL FINAL
+    Route::get('/events/{event}', [EventController::class, 'show']);
+
     Route::get('/events/{id}/edit', [EventController::class, 'edit']);
     Route::put('/events/{id}', [EventController::class, 'update']);
     Route::delete('/events/{id}', [EventController::class, 'destroy']);
-});
 
-// --- ACCIONES DE FORMULARIO (POST/DELETE) ---
-Route::middleware('auth')->group(function () {
     Route::post('/events/{id}/register', [EventController::class, 'register']);
     Route::delete('/events/{id}/unregister', [EventController::class, 'unregister']);
-    Route::post('/events/{id}/approve', [EventController::class, 'approve']);
-    Route::post('/events/{id}/reject', [EventController::class, 'reject']);
 });
 
-// --- PERFIL DE USUARIO ---
+/* ---------------- PERFIL ---------------- */
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profile', [ProfileController::class, 'edit']);
+    Route::patch('/profile', [ProfileController::class, 'update']);
+    Route::delete('/profile', [ProfileController::class, 'destroy']);
 });
 
 require __DIR__.'/auth.php';

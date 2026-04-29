@@ -21,6 +21,10 @@ return new class extends Migration
             $table->enum('status',['pending','approved','rejected']);
             $table->foreignId('user_id')->constrained();
             $table->timestamps();
+            $table->foreignId('space_id')->nullable()->constrained();
+            $table->string('image')->nullable();
+
+
         });
     }
 
