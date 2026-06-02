@@ -89,6 +89,27 @@
                             @error('description') <p class="text-red-500 text-xs">{{ $message }}</p> @enderror
                         </div>
 
+                        <div>
+    <label class="block text-sm font-medium">
+        Categorías
+    </label>
+
+    <div class="space-y-2 mt-2">
+
+        @foreach($categories as $category)
+            <label class="flex items-center gap-2">
+                <input
+                    type="checkbox"
+                    name="categories[]"
+                    value="{{ $category->id }}"
+                >
+                {{ $category->name }}
+            </label>
+        @endforeach
+
+    </div>
+</div>
+
                         {{-- IMAGEN --}}
                         <div>
                             <label class="block text-sm font-medium">Imagen</label>

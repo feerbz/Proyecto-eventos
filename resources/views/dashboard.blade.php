@@ -36,7 +36,31 @@
 
     <div class="py-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <form method="GET" action="{{ route('dashboard') }}" class="mb-6">
 
+    <label class="block text-sm font-medium mb-2">
+        Filtrar por categoría
+    </label>
+
+    <select
+        name="category"
+        onchange="this.form.submit()"
+        class="rounded-xl border-gray-300"
+    >
+        <option value="">Todas las categorías</option>
+
+        @foreach($categories as $category)
+            <option
+                value="{{ $category->id }}"
+                {{ request('category') == $category->id ? 'selected' : '' }}
+            >
+                {{ $category->name }}
+            </option>
+        @endforeach
+
+    </select>
+
+</form>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
 @forelse ($events as $event)
@@ -64,7 +88,15 @@
         <h3 class="text-lg font-bold">
             {{ $event->title }}
         </h3>
-
+        @if($event->categories->count())
+    <div class="flex flex-wrap gap-2 mt-2">
+        @foreach($event->categories as $category)
+            <span class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">
+                {{ $category->name }}
+            </span>
+        @endforeach
+    </div>
+@endif
         {{-- AUTOR --}}
         <p class="text-xs text-gray-400 mb-2">
             Creado por: {{ $event->user->name }}
@@ -85,9 +117,6 @@
         {{ $total }} / {{ $event->capacity }}
     @endif
 </p>
-
-
-
         {{-- BOTONES --}}
         @if($inscrito)
 

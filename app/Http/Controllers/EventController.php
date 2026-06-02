@@ -4,27 +4,45 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\Space;
+use App\Models\Category;
 use App\Models\Registration;
 use Illuminate\Http\Request;
 
 class EventController extends Controller
 {
     /* ---------------- DASHBOARD ---------------- */
-    public function feed()
-    {
-        $events = Event::where('status', 'approved')
-            ->with(['registrations','user','space'])
-            ->orderBy('event_date', 'asc')
-            ->get();
+public function feed(Request $request)
+{
+    $events = Event::where('status', 'approved')
+        ->with([
+            'registrations',
+            'user',
+            'space',
+            'categories'
+        ]);
 
-        return view('dashboard', compact('events'));
+    if ($request->category) {
+        $events->whereHas('categories', function ($query) use ($request) {
+        $query->where('categories.id', $request->category);
+        });
     }
+
+    $events = $events
+        ->orderBy('event_date', 'asc')
+        ->get();
+
+    $categories = \App\Models\Category::orderBy('name')->get();
+
+    return view('dashboard', compact('events', 'categories'));
+}
 
     /* ---------------- CREATE ---------------- */
     public function create()
     {
-        $spaces = Space::all();
-        return view('events.create', compact('spaces'));
+    $spaces = Space::all();
+    $categories = Category::all();
+
+    return view('events.create', compact('spaces', 'categories'));
     }
 
     /* ---------------- STORE ---------------- */
