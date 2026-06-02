@@ -39,90 +39,103 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-                @forelse ($events as $event)
+@forelse ($events as $event)
 
-                    @php
-                        $inscrito = \App\Models\Registration::where('user_id', auth()->id())
-                            ->where('event_id', $event->id)
-                            ->exists();
+    @php
+        $inscrito = \App\Models\Registration::where('user_id', auth()->id())
+            ->where('event_id', $event->id)
+            ->exists();
 
-                        $total = \App\Models\Registration::where('event_id', $event->id)->count();
-                    @endphp
+        $total = \App\Models\Registration::where('event_id', $event->id)->count();
+    @endphp
 
-                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 flex flex-col transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border p-6 flex flex-col">
 
-                        <span class="inline-block px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-[10px] font-extrabold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest w-max mb-4">
-                            {{ $event->location }}
-                        </span>
+        <span class="text-xs text-emerald-600 mb-2">
+            {{ $event->location ?? $event->space?->name }}
+        </span>
 
-                        <h3 class="text-lg font-black text-gray-900 dark:text-white mb-2">
-                            {{ $event->title }}
-                        </h3>
+        {{-- IMAGEN --}}
+        @if($event->image)
+            <img src="{{ asset('storage/'.$event->image) }}" 
+                 class="w-full h-40 object-cover rounded-xl mb-4">
+        @endif
 
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-3 flex-grow line-clamp-3">
-                            {{ $event->description }}
-                        </p>
+        <h3 class="text-lg font-bold">
+            {{ $event->title }}
+        </h3>
 
-                        <a href="/events/{{ $event->id }}" class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-bold text-sm inline-flex items-center gap-1 mb-6 transition-colors w-max">
-                            Ver detalles completos
-                            <span aria-hidden="true">&rarr;</span>
-                        </a>
+        {{-- AUTOR --}}
+        <p class="text-xs text-gray-400 mb-2">
+            Creado por: {{ $event->user->name }}
+        </p>
 
-                        <p class="text-sm mb-2 text-gray-700 dark:text-gray-300 font-medium">
-                            📅 {{ \Carbon\Carbon::parse($event->event_date)->format('d M Y h:i A') }}
-                        </p>
+        <p class="text-sm text-gray-500 mb-3">
+            {{ $event->description }}
+        </p>
 
-                        <p class="text-sm mb-6 text-emerald-600 dark:text-emerald-400 font-bold">
-                            👥 Cupo: {{ $total }} / {{ $event->capacity }}
-                        </p>
+        <p class="text-sm mb-2">
+            📅 {{ \Carbon\Carbon::parse($event->event_date)->format('d M Y h:i A') }}
+        </p>
+        <p class="text-sm mb-4">
+    👥 
+    @if($event->space && $event->space->is_unlimited)
+        ∞ ILIMITADO
+    @else
+        {{ $total }} / {{ $event->capacity }}
+    @endif
+</p>
 
-                        <div class="mt-auto border-t border-gray-100 dark:border-gray-700 pt-4">
-                            @if($inscrito)
 
-                                <div class="text-center mb-2">
-                                    <span class="inline-block bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-3 py-1 rounded-full text-xs font-bold w-full">
-                                        ✓ Ya estás inscrito
-                                    </span>
-                                </div>
 
-                                <form method="POST" action="/events/{{ $event->id }}/unregister">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="w-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-500 hover:text-white dark:hover:bg-red-600 dark:hover:text-white font-bold text-sm py-2.5 rounded-xl transition-colors border border-red-200 dark:border-red-800/50"
-                                        onclick="return confirm('¿Seguro que deseas cancelar tu inscripción a este evento?')">
-                                        Cancelar inscripción
-                                    </button>
-                                </form>
+        {{-- BOTONES --}}
+        @if($inscrito)
 
-                            @elseif($total >= $event->capacity)
+            <form method="POST" action="/events/{{ $event->id }}/unregister">
+                @csrf
+                @method('DELETE')
+                <button class="bg-red-500 text-white px-3 py-1 rounded">
+                    Cancelar inscripción
+                </button>
+            </form>
 
-                                <button disabled class="w-full bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 font-bold text-sm py-2.5 rounded-xl cursor-not-allowed">
-                                    Evento lleno
-                                </button>
+        @elseif(!$event->space?->is_unlimited && $total >= $event->capacity)
 
-                            @else
+            <button disabled class="bg-gray-300 px-3 py-1 rounded">
+                Evento lleno
+            </button>
 
-                                <form method="POST" action="/events/{{ $event->id }}/register">
-                                    @csrf
-                                    <button class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm py-2.5 rounded-xl shadow-md active:scale-[0.98] transition-all">
-                                        Inscribirme
-                                    </button>
-                                </form>
+        @else
 
-                            @endif
-                        </div>
+            <form method="POST" action="/events/{{ $event->id }}/register">
+                @csrf
+                <button class="bg-green-600 text-white px-3 py-1 rounded">
+                    Inscribirme
+                </button>
+            </form>
 
-                    </div>
+        @endif
 
-                @empty
-                    <div class="col-span-full flex flex-col items-center justify-center py-20 text-center">
-                        <div class="bg-gray-100 dark:bg-gray-800 p-6 rounded-full mb-4">
-                            <svg class="w-12 h-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-800 dark:text-white">No hay eventos disponibles</h3>
-                        <p class="text-gray-500 dark:text-gray-400 mt-2">Vuelve más tarde para ver las novedades.</p>
-                    </div>
-                @endforelse
+     </div>
+
+@empty
+
+    <div class="col-span-full flex flex-col items-center justify-center py-20 text-center">
+        <div class="bg-gray-100 dark:bg-gray-800 p-6 rounded-full mb-4">
+            <svg class="w-12 h-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 dark:text-white">
+            No hay eventos disponibles
+        </h3>
+        <p class="text-gray-500 dark:text-gray-400 mt-2">
+            Vuelve más tarde para ver las novedades.
+        </p>
+    </div>
+
+@endforelse
 
             </div>
 

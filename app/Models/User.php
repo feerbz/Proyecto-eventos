@@ -10,7 +10,6 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
     /**
@@ -22,7 +21,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role', // <--- ¡AQUÍ ESTÁ EL PERMISO QUE FALTABA!
+        'role',
+        'phone',
     ];
 
     /**
@@ -47,4 +47,11 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function events()
+    {
+        return $this->hasMany(Event::class);
+    }
 }
+
+
