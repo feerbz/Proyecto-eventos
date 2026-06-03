@@ -60,11 +60,20 @@ Route::middleware('auth')->group(function () {
 require __DIR__.'/auth.php';
 
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 Route::get('/migrar-db-secreto', function () {
     try {
+        // 1. Engañamos a la migración terca creando las columnas fantasma si no existen
+        if (!Schema::hasColumn('users', 'student_year')) {
+            DB::statement('ALTER TABLE users ADD COLUMN student_year VARCHAR(255), ADD COLUMN career VARCHAR(255);');
+        }
+
+        // 2. Ahora sí, corremos todas las migraciones (la vieja las borrará felizmente y la de Fer pasará limpio)
         Artisan::call('migrate', ['--force' => true]);
-        return "¡Migraciones ejecutadas con éxito, Fercho!";
+        
+        return "¡Hack maestro completado, Fercho! Las tablas están listas.";
     } catch (\Exception $e) {
         return "Error: " . $e->getMessage();
     }
