@@ -59,3 +59,13 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
+use Illuminate\Support\Facades\Artisan;
+
+Route::get('/migrar-db-secreto', function () {
+    try {
+        Artisan::call('migrate', ['--force' => true]);
+        return "¡Migraciones ejecutadas con éxito, Fercho!";
+    } catch (\Exception $e) {
+        return "Error: " . $e->getMessage();
+    }
+});
