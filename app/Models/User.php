@@ -52,6 +52,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(Event::class);
     }
+    public function waitlists()
+{
+    return $this->hasMany(Waitlist::class);
+}
+
 }
 
 

@@ -65,13 +65,20 @@
 
 @forelse ($events as $event)
 
-    @php
-        $inscrito = \App\Models\Registration::where('user_id', auth()->id())
-            ->where('event_id', $event->id)
-            ->exists();
+@php
+    $inscrito = \App\Models\Registration::where('user_id', auth()->id())
+        ->where('event_id', $event->id)
+        ->exists();
 
-        $total = \App\Models\Registration::where('event_id', $event->id)->count();
-    @endphp
+    $enEspera = \App\Models\Waitlist::where('user_id', auth()->id())
+        ->where('event_id', $event->id)
+        ->exists();
+
+    $total = \App\Models\Registration::where('event_id', $event->id)->count();
+    $enListaEspera = \App\Models\Waitlist::where('user_id', auth()->id())
+    ->where('event_id', $event->id)
+    ->exists();
+@endphp
 
     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border p-6 flex flex-col">
 
@@ -118,33 +125,46 @@
     @endif
 </p>
         {{-- BOTONES --}}
-        @if($inscrito)
+@if($inscrito)
 
-            <form method="POST" action="/events/{{ $event->id }}/unregister">
-                @csrf
-                @method('DELETE')
-                <button class="bg-red-500 text-white px-3 py-1 rounded">
-                    Cancelar inscripción
-                </button>
-            </form>
+    <form method="POST" action="/events/{{ $event->id }}/unregister">
+        @csrf
+        @method('DELETE')
+        <button class="bg-red-500 text-white px-3 py-1 rounded">
+            Cancelar inscripción
+        </button>
+    </form>
 
-        @elseif(!$event->space?->is_unlimited && $total >= $event->capacity)
+@elseif($enEspera)
 
-            <button disabled class="bg-gray-300 px-3 py-1 rounded">
-                Evento lleno
-            </button>
+    <form method="POST" action="/events/{{ $event->id }}/waitlist">
+        @csrf
+        @method('DELETE')
 
-        @else
+ <button class="bg-red-500 text-white px-3 py-1 rounded border border-black">
+    Salir de lista de espera
+</button>
+    </form>
 
-            <form method="POST" action="/events/{{ $event->id }}/register">
-                @csrf
-                <button class="bg-green-600 text-white px-3 py-1 rounded">
-                    Inscribirme
-                </button>
-            </form>
+@elseif(!$event->space?->is_unlimited && $total >= $event->capacity)
 
-        @endif
+    <form method="POST" action="/events/{{ $event->id }}/waitlist">
+        @csrf
+        <button class="bg-green-600 text-white px-3 py-1 rounded">
+            Entrar a lista de espera
+        </button>
+    </form>
 
+@else
+
+    <form method="POST" action="/events/{{ $event->id }}/register">
+        @csrf
+        <button class="bg-green-600 text-white px-3 py-1 rounded">
+            Inscribirme
+        </button>
+    </form>
+
+@endif
      </div>
 
 @empty

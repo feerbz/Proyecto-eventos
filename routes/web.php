@@ -5,6 +5,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SpaceController;
 
+Route::delete('/events/{id}/waitlist', [EventController::class, 'leaveWaitlist']);
 
 /* ---------------- PUBLICO ---------------- */
 Route::get('/', function () {
@@ -18,6 +19,8 @@ Route::get('/dashboard', [EventController::class, 'feed'])
 
 /* ---------------- RUTAS AUTENTICADAS ---------------- */
 Route::middleware('auth')->group(function () {
+
+    Route::post('/events/{id}/waitlist', [EventController::class, 'joinWaitlist']);
 
     /* -------- ESPACIOS -------- */
     Route::get('/spaces/create', [SpaceController::class, 'create']);

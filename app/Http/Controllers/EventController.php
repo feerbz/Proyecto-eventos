@@ -7,6 +7,9 @@ use App\Models\Space;
 use App\Models\Category;
 use App\Models\Registration;
 use Illuminate\Http\Request;
+use App\Models\Waitlist;
+use App\Models\User;
+use Illuminate\Support\Facades\Mail;
 
 class EventController extends Controller
 {
@@ -265,13 +268,63 @@ $request->validate([
     }
 
     public function unregister($id)
-    {
-        Registration::where('user_id', auth()->id())
-            ->where('event_id', $id)
-            ->delete();
+{
+    Registration::where('user_id', auth()->id())
+        ->where('event_id', $id)
+        ->delete();
 
-        return back()->with('success', 'Inscripción cancelada');
+    $waitingUser = Waitlist::where('event_id', $id)
+        ->orderBy('created_at')
+        ->first();
+
+    if ($waitingUser) {
+
+        Registration::create([
+            'user_id' => $waitingUser->user_id,
+            'event_id' => $id,
+        ]);
+
+        Mail::raw(
+            'Se liberó un lugar y has sido inscrito automáticamente en el evento.',
+            function ($message) use ($waitingUser) {
+                $message->to($waitingUser->user->email)
+                        ->subject('Inscripción automática');
+            }
+        );
+
+        $waitingUser->delete();
     }
+
+    return back()->with('success', 'Inscripción cancelada');
+}
+    public function joinWaitlist($id)
+{
+    $exists = Waitlist::where('user_id', auth()->id())
+        ->where('event_id', $id)
+        ->exists();
+
+    if ($exists) {
+        return back()->with('error', 'Ya estás en lista de espera');
+    }
+
+    Waitlist::create([
+        'user_id' => auth()->id(),
+        'event_id' => $id,
+    ]);
+
+    return back()->with('success', 'Agregado a lista de espera');
+}
+public function leaveWaitlist($id)
+{
+    Waitlist::where('user_id', auth()->id())
+        ->where('event_id', $id)
+        ->delete();
+
+    return back()->with(
+        'success',
+        'Has salido de la lista de espera'
+    );
+}
 }
 
 

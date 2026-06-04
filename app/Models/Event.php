@@ -18,6 +18,11 @@ class Event extends Model
     'space_id',
     'image',
 ];
+public function waitlists()
+{
+    return $this->hasMany(Waitlist::class);
+}
+
 public function registrations()
 {
     return $this->hasMany(Registration::class);
