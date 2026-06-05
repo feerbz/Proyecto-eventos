@@ -68,16 +68,15 @@ use Illuminate\Support\Facades\Schema;
 
 Route::get('/migrar-db-secreto', function () {
     try {
-        // 1. Engañamos a la migración terca creando las columnas fantasma si no existen
-        if (!Schema::hasColumn('users', 'student_year')) {
-            DB::statement('ALTER TABLE users ADD COLUMN student_year VARCHAR(255), ADD COLUMN career VARCHAR(255);');
+
+        if (!Schema::hasColumn('users', 'phone')) {
+            DB::statement('ALTER TABLE users ADD COLUMN phone VARCHAR(255);');
         }
 
-        // 2. Ahora sí, corremos todas las migraciones (la vieja las borrará felizmente y la de Fer pasará limpio)
         Artisan::call('migrate', ['--force' => true]);
-        
-        return "¡Hack maestro completado, Fercho! Las tablas están listas.";
+
+        return "Phone verificado.";
     } catch (\Exception $e) {
-        return "Error: " . $e->getMessage();
+        return $e->getMessage();
     }
 });
