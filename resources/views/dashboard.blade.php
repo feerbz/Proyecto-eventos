@@ -88,8 +88,8 @@
 
         {{-- IMAGEN --}}
         @if($event->image)
-            <img src="{{ asset('storage/'.$event->image) }}" 
-                 class="w-full h-40 object-cover rounded-xl mb-4">
+            <img src="/event-image/{{ $event->id }}"
+                class="w-full h-40 object-cover rounded-xl mb-4">
         @endif
 
         <h3 class="text-lg font-bold">

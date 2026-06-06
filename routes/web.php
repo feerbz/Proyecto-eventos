@@ -63,17 +63,21 @@ Route::middleware('auth')->group(function () {
 
 
 require __DIR__.'/auth.php';
-Route::get('/test-public-file', function () {
+use App\Models\Event;
 
-    $event = \App\Models\Event::whereNotNull('image')->latest()->first();
+Route::get('/event-image/{event}', function (Event $event) {
 
-    return [
-        'image' => $event->image,
-        'public_file_exists' => file_exists(
-            public_path('storage/' . $event->image)
-        ),
-        'public_path' => public_path('storage/' . $event->image),
-    ];
+    if (!$event->image) {
+        abort(404);
+    }
+
+    $path = storage_path('app/public/' . $event->image);
+
+    if (!file_exists($path)) {
+        abort(404);
+    }
+
+    return response()->file($path);
 });
 
 
