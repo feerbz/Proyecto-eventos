@@ -67,17 +67,3 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 
-Route::get('/migrar-db-secreto', function () {
-    try {
-
-        if (!Schema::hasColumn('events', 'image')) {
-            DB::statement('ALTER TABLE events ADD COLUMN image VARCHAR(255) NULL;');
-        }
-
-        Artisan::call('migrate', ['--force' => true]);
-
-        return "image verificada.";
-    } catch (\Exception $e) {
-        return $e->getMessage();
-    }
-});

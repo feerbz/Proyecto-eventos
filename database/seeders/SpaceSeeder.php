@@ -10,15 +10,31 @@ class SpaceSeeder extends Seeder
     public function run(): void
     {
         $spaces = [
-            'Auditorio A',
-            'Lobby culturales',
-            'Explanada gobierno',
+            [
+                'name' => 'Auditorio A',
+                'capacity' => 50,
+                'is_unlimited' => false,
+            ],
+            [
+                'name' => 'Lobby culturales',
+                'capacity' => 100,
+                'is_unlimited' => false,
+            ],
+            [
+                'name' => 'Explanada gobierno',
+                'capacity' => 300,
+                'is_unlimited' => false,
+            ],
         ];
 
         foreach ($spaces as $space) {
-            Space::firstOrCreate([
-                'name' => $space
-            ]);
+            Space::updateOrCreate(
+                ['name' => $space['name']],
+                [
+                    'capacity' => $space['capacity'],
+                    'is_unlimited' => $space['is_unlimited'],
+                ]
+            );
         }
     }
 }
