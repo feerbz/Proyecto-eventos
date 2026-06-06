@@ -63,16 +63,14 @@ Route::middleware('auth')->group(function () {
 
 
 require __DIR__.'/auth.php';
+Route::get('/test-image', function () {
 
-
-Route::get('/fix-storage', function () {
-
-    Artisan::call('storage:link');
+    $event = \App\Models\Event::whereNotNull('image')->latest()->first();
 
     return [
-        'storage_exists' => file_exists(public_path('storage')),
-        'storage_is_link' => is_link(public_path('storage')),
-        'message' => 'Storage link creado'
+        'image' => $event?->image,
+        'full_path' => storage_path('app/public/' . $event?->image),
+        'exists' => file_exists(storage_path('app/public/' . $event?->image)),
     ];
 });
 
