@@ -65,34 +65,12 @@ require __DIR__.'/auth.php';
 use App\Models\Space;
 use App\Models\Event;
 
-Route::get('/fix-spaces-temp', function () {
-
-    // Primero borramos eventos para evitar problemas de llaves foráneas
-    Event::query()->delete();
-
-    // Luego borramos espacios
-    Space::query()->delete();
-
-    // Creamos los espacios correctos
-    Space::create([
-        'name' => 'Auditorio A',
-        'capacity' => 50,
-        'is_unlimited' => false,
-    ]);
-
-    Space::create([
-        'name' => 'Lobby culturales',
-        'capacity' => 100,
-        'is_unlimited' => false,
-    ]);
-
-    Space::create([
-        'name' => 'Explanada gobierno',
-        'capacity' => 300,
-        'is_unlimited' => false,
-    ]);
-
-    return 'Espacios recreados correctamente.';
+Route::get('/test-storage', function () {
+    return [
+        'storage_exists' => file_exists(public_path('storage')),
+        'storage_is_link' => is_link(public_path('storage')),
+        'public_storage' => public_path('storage'),
+    ];
 });
 
 use Illuminate\Support\Facades\Artisan;
