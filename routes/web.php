@@ -69,13 +69,13 @@ use Illuminate\Support\Facades\Schema;
 Route::get('/migrar-db-secreto', function () {
     try {
 
-        if (!Schema::hasColumn('users', 'phone')) {
-            DB::statement('ALTER TABLE users ADD COLUMN phone VARCHAR(255);');
+        if (!Schema::hasColumn('events', 'space_id')) {
+            DB::statement('ALTER TABLE events ADD COLUMN space_id BIGINT NULL;');
         }
 
         Artisan::call('migrate', ['--force' => true]);
 
-        return "Phone verificado.";
+        return "space_id verificado.";
     } catch (\Exception $e) {
         return $e->getMessage();
     }
