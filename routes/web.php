@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SpaceController;
@@ -62,10 +63,7 @@ Route::middleware('auth')->group(function () {
 
 
 require __DIR__.'/auth.php';
-use App\Models\Space;
-use App\Models\Event;
 
-use Illuminate\Support\Facades\Artisan;
 
 Route::get('/fix-storage', function () {
 
@@ -78,8 +76,7 @@ Route::get('/fix-storage', function () {
     ];
 });
 
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
+
+
 
 
