@@ -60,7 +60,40 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+
 require __DIR__.'/auth.php';
+use App\Models\Space;
+use App\Models\Event;
+
+Route::get('/fix-spaces-temp', function () {
+
+    // Primero borramos eventos para evitar problemas de llaves foráneas
+    Event::query()->delete();
+
+    // Luego borramos espacios
+    Space::query()->delete();
+
+    // Creamos los espacios correctos
+    Space::create([
+        'name' => 'Auditorio A',
+        'capacity' => 50,
+        'is_unlimited' => false,
+    ]);
+
+    Space::create([
+        'name' => 'Lobby culturales',
+        'capacity' => 100,
+        'is_unlimited' => false,
+    ]);
+
+    Space::create([
+        'name' => 'Explanada gobierno',
+        'capacity' => 300,
+        'is_unlimited' => false,
+    ]);
+
+    return 'Espacios recreados correctamente.';
+});
 
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
