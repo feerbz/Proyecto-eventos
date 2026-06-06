@@ -66,17 +66,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
+
 Route::get('/migrar-db-secreto', function () {
-    try {
-
-        if (!Schema::hasColumn('events', 'space_id')) {
-            DB::statement('ALTER TABLE events ADD COLUMN space_id BIGINT NULL;');
-        }
-
-        Artisan::call('migrate', ['--force' => true]);
-
-        return "space_id verificado.";
-    } catch (\Exception $e) {
-        return $e->getMessage();
-    }
+    return Schema::getColumnListing('events');
 });
