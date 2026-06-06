@@ -65,11 +65,16 @@ require __DIR__.'/auth.php';
 use App\Models\Space;
 use App\Models\Event;
 
-Route::get('/test-storage', function () {
+use Illuminate\Support\Facades\Artisan;
+
+Route::get('/fix-storage', function () {
+
+    Artisan::call('storage:link');
+
     return [
         'storage_exists' => file_exists(public_path('storage')),
         'storage_is_link' => is_link(public_path('storage')),
-        'public_storage' => public_path('storage'),
+        'message' => 'Storage link creado'
     ];
 });
 
