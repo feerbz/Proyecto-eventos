@@ -1,11 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SpaceController;
-use Illuminate\Support\Facades\Schema;
 
 Route::delete('/events/{id}/waitlist', [EventController::class, 'leaveWaitlist']);
 
@@ -61,18 +59,23 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+Route::get('/event-image/{event}', function (\App\Models\Event $event) {
 
+    if (!$event->image) {
+        abort(404);
+    }
+
+    $path = storage_path('app/public/' . $event->image);
+
+    if (!file_exists($path)) {
+        abort(404);
+    }
+
+    return response()->file($path);
+});
 
 require __DIR__.'/auth.php';
-Route::get('/schema-check', function () {
 
-    return [
-        'users' => Schema::getColumnListing('users'),
-        'events' => Schema::getColumnListing('events'),
-        'spaces' => Schema::getColumnListing('spaces'),
-        'categories' => Schema::getColumnListing('categories'),
-    ];
-});
 
 
 
