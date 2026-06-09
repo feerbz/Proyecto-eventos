@@ -118,11 +118,14 @@
         </p>
         <p class="text-sm mb-4">
     👥 
-    @if($event->space && $event->space->is_unlimited)
-        ∞ ILIMITADO
-    @else
-        {{ $total }} / {{ $event->capacity }}
-    @endif
+@if(
+    ($event->space && $event->space->is_unlimited)
+    || is_null($event->capacity)
+)
+    ∞ ILIMITADO
+@else
+    {{ $total }} / {{ $event->capacity }}
+@endif
 </p>
         {{-- BOTONES --}}
 @if($inscrito)
@@ -146,7 +149,11 @@
 </button>
     </form>
 
-@elseif(!$event->space?->is_unlimited && $total >= $event->capacity)
+@elseif(
+    !is_null($event->capacity)
+    && !$event->space?->is_unlimited
+    && $total >= $event->capacity
+)
 
     <form method="POST" action="/events/{{ $event->id }}/waitlist">
         @csrf

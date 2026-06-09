@@ -38,25 +38,9 @@
                     <x-nav-link href="/mis-inscripciones" :active="request()->is('mis-inscripciones')" class="inline-flex items-center gap-2">
                         Mis inscripciones
                     </x-nav-link>
-
-                    @if(auth()->user()->role === 'admin')
-                        <x-nav-link href="/events/pending" :active="request()->is('events/pending')" class="inline-flex items-center gap-2 text-amber-500 font-semibold">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2"/>
-                            </svg>
-                            Pendientes
-                        </x-nav-link>
-                        @endif
-
-                    @if(auth()->user()->role === 'admin')
-                        <x-nav-link href="/spaces/create" :active="request()->is('spaces/create')" class="inline-flex items-center gap-2 text-amber-500 font-semibold">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path d="M3 7h18M3 12h18M3 17h18" stroke-width="2"/>
-                                    </svg>
-                                    Crear espacio
-                        </x-nav-link>
-                    @endif
-
+                    <x-dropdown-link href="/historial">
+                        Historial
+                    </x-dropdown-link>
                 </div>
             </div>
 
@@ -73,17 +57,48 @@
                         </button>
                     </x-slot>
 
-                    <x-slot name="content">
-                        <x-dropdown-link href="/profile">Perfil</x-dropdown-link>
+<x-slot name="content">
 
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <x-dropdown-link :href="route('logout')"
-                                onclick="event.preventDefault(); this.closest('form').submit();">
-                                Cerrar Sesión
-                            </x-dropdown-link>
-                        </form>
-                    </x-slot>
+    <x-dropdown-link href="/profile">
+        Perfil
+    </x-dropdown-link>
+
+    @if(auth()->user()->role === 'admin')
+
+        <x-dropdown-link href="/events/pending">
+            Pendientes
+        </x-dropdown-link>
+        <x-dropdown-link href="/spaces/create">
+            Crear espacio
+        </x-dropdown-link>
+
+        <x-dropdown-link href="/spaces">
+            Administrar espacios
+        </x-dropdown-link>
+
+        <x-dropdown-link href="/categories">
+            Administrar categorías
+        </x-dropdown-link>
+
+    @endif
+    <x-dropdown-link href="/calendario">
+    Calendario
+</x-dropdown-link>
+
+    <form method="POST" action="{{ route('logout') }}">
+        @csrf
+
+        <x-dropdown-link
+            :href="route('logout')"
+            onclick="event.preventDefault(); this.closest('form').submit();">
+
+            Cerrar Sesión
+
+        </x-dropdown-link>
+
+    </form>
+
+</x-slot>
                 </x-dropdown>
             </div>
 

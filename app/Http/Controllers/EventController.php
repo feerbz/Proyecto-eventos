@@ -137,7 +137,7 @@ $request->validate([
         'status' => 'pending',
         'user_id' => auth()->id(),
         'space_id' => $spaceId,
-        'location' => $customLocation,
+        'location' => $spaceId ? null : $customLocation,
         'image' => $imagePath,
     ]);
 
@@ -171,20 +171,112 @@ $request->validate([
     }
 
     /* ---------------- EDIT ---------------- */
-    public function edit($id)
-    {
-        $event = Event::findOrFail($id);
-        return view('events.edit', compact('event'));
-    }
+public function edit($id)
+{
+    $event = Event::findOrFail($id);
+
+    $spaces = Space::all();
+    $categories = Category::all();
+
+    return view(
+        'events.edit',
+        compact('event', 'spaces', 'categories')
+    );
+}
 
     /* ---------------- UPDATE ---------------- */
     public function update(Request $request, $id)
-    {
-        $event = Event::findOrFail($id);
-        $event->update($request->all());
+{
+    $event = Event::findOrFail($id);
 
-        return redirect('/mis-eventos');
+    $spaceId = $request->space_id;
+    $customLocation = $request->location;
+
+    if ($spaceId === "other") {
+        $spaceId = null;
     }
+    $start = \Carbon\Carbon::parse($request->event_date);
+$end = \Carbon\Carbon::parse(
+    $start->format('Y-m-d') . ' ' . $request->end_time
+);
+
+if ($end <= $start) {
+    return back()
+        ->with('error', 'La hora de fin debe ser mayor a la de inicio')
+        ->withInput();
+}
+    // CAPACIDAD
+    if ($spaceId) {
+
+        $space = Space::find($spaceId);
+
+        if ($space && $space->is_unlimited) {
+            $capacity = null;
+        } else {
+            $capacity = $request->capacity;
+        }
+
+    } else {
+
+        $capacity = $request->capacity;
+    }
+
+    // IMAGEN
+    $imagePath = $event->image;
+
+    if ($request->hasFile('image')) {
+
+        $imagePath = $request
+            ->file('image')
+            ->store('events', 'public');
+    }
+    if ($spaceId) {
+
+    $events = Event::where('space_id', $spaceId)
+        ->where('id', '!=', $event->id)
+        ->whereDate('event_date', $start->toDateString())
+        ->get();
+
+    foreach ($events as $otherEvent) {
+
+        $eventStart = \Carbon\Carbon::parse(
+            $otherEvent->event_date
+        );
+
+        $eventEnd = \Carbon\Carbon::parse(
+            $eventStart->format('Y-m-d') . ' ' . $otherEvent->end_time
+        );
+
+        if ($start < $eventEnd && $end > $eventStart) {
+
+            return back()
+                ->with('error', 'Ese espacio ya está ocupado en ese horario')
+                ->withInput();
+        }
+    }
+}
+    $event->update([
+        'title' => $request->title,
+        'description' => $request->description,
+        'event_date' => $request->event_date,
+        'capacity' => $capacity,
+        'space_id' => $spaceId,
+        'location' => $spaceId ? null : $customLocation,
+        'image' => $imagePath,
+        'end_time' => $request->end_time,
+
+        // vuelve a revisión
+        'status' => 'pending',
+    ]);
+
+    // categorías
+    $event->categories()->sync(
+        $request->categories ?? []
+    );
+
+    return redirect('/mis-eventos')
+        ->with('success', 'Evento actualizado y enviado nuevamente a revisión');
+}
 
     /* ---------------- DELETE ---------------- */
     public function destroy($id)
@@ -325,6 +417,29 @@ public function leaveWaitlist($id)
         'Has salido de la lista de espera'
     );
 }
+public function history()
+{
+    $registrations = Registration::where('user_id', auth()->id())
+        ->with('event')
+        ->get();
+
+    $waitlists = Waitlist::where('user_id', auth()->id())
+        ->with('event')
+        ->get();
+
+    return view('events.history', compact(
+        'registrations',
+        'waitlists'
+    ));
+}
+public function calendar()
+{
+    $events = Event::where('status', 'approved')
+        ->get();
+
+    return view('events.calendar', compact('events'));
+}
+
 }
 
 
