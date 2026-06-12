@@ -41,6 +41,8 @@
                     <x-dropdown-link href="/historial">
                         Historial
                     </x-dropdown-link>
+                    <x-dropdown-link href="/calendario">
+                        Calendario </x-dropdown-link>
                 </div>
             </div>
 
@@ -79,11 +81,14 @@
         <x-dropdown-link href="/categories">
             Administrar categorías
         </x-dropdown-link>
+        <x-dropdown-link href="/metricas">
+            Métricas
+        </x-dropdown-link>
+        <x-dropdown-link href="/attendance">
+    Control de asistencia
+</x-dropdown-link>
 
     @endif
-    <x-dropdown-link href="/calendario">
-    Calendario
-</x-dropdown-link>
 
     <form method="POST" action="{{ route('logout') }}">
         @csrf
@@ -93,8 +98,8 @@
             onclick="event.preventDefault(); this.closest('form').submit();">
 
             Cerrar Sesión
-
         </x-dropdown-link>
+
 
     </form>
 

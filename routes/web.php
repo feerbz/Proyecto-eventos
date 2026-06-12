@@ -6,8 +6,13 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SpaceController;
 use App\Http\Controllers\CategoryController;
 
+
+Route::get('/metricas', [EventController::class, 'metrics']);
 Route::delete('/events/{id}/waitlist', [EventController::class, 'leaveWaitlist']);
-Route::get('/calendario', [EventController::class, 'calendar']);
+Route::get(
+    '/metricas/exportar',
+    [EventController::class, 'exportMetrics']
+);
 
 /* ---------------- PUBLICO ---------------- */
 Route::get('/', function () {
@@ -22,14 +27,26 @@ Route::get('/dashboard', [EventController::class, 'feed'])
 /* ---------------- RUTAS AUTENTICADAS ---------------- */
 Route::middleware('auth')->group(function () {
 
+    Route::get(
+    '/events/{id}/attendance',
+    [EventController::class, 'attendanceForm']
+);
+
+Route::post(
+    '/events/{id}/attendance',
+    [EventController::class, 'registerAttendance']
+);
+Route::get(
+    '/attendance',
+    [EventController::class, 'attendanceIndex']
+);
+
     Route::get('/categories', [CategoryController::class, 'index']);
     Route::get('/categories/create', [CategoryController::class, 'create']);
     Route::post('/categories', [CategoryController::class, 'store']);
-
     Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
-
-
     Route::post('/events/{id}/waitlist', [EventController::class, 'joinWaitlist']);
+    Route::get('/calendario', [EventController::class, 'calendar']);
 
     /* -------- ESPACIOS -------- */
     Route::get('/spaces/create', [SpaceController::class, 'create']);
@@ -52,6 +69,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/mis-eventos', [EventController::class, 'myEvents']);
     Route::get('/mis-inscripciones', [EventController::class, 'myRegistrations']);
     Route::get('/historial', [EventController::class, 'history']);
+
     // ACCIONES ADMIN
     Route::post('/events/{id}/approve', [EventController::class, 'approve']);
     Route::post('/events/{id}/reject', [EventController::class, 'reject']);
@@ -71,9 +89,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-    Route::get('/event-image/{event}', function (\App\Models\Event $event) {
+    });
 
+    Route::get('/event-image/{event}', function (\App\Models\Event $event) {
     if (!$event->image) {
         abort(404);
     }
@@ -87,10 +105,5 @@ Route::middleware('auth')->group(function () {
     return response()->file($path);
 });
 
+
 require __DIR__.'/auth.php';
-
-
-
-
-
-

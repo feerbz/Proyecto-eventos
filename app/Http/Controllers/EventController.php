@@ -9,6 +9,7 @@ use App\Models\Registration;
 use Illuminate\Http\Request;
 use App\Models\Waitlist;
 use App\Models\User;
+use App\Models\Attendance;
 use Illuminate\Support\Facades\Mail;
 
 class EventController extends Controller
@@ -432,12 +433,231 @@ public function history()
         'waitlists'
     ));
 }
-public function calendar()
+
+public function calendar(Request $request)
 {
     $events = Event::where('status', 'approved')
-        ->get();
+        ->with('space');
 
-    return view('events.calendar', compact('events'));
+    if ($request->space_id) {
+
+        $events->where('space_id', $request->space_id);
+
+    }
+
+    $events = $events->get();
+
+    $spaces = Space::orderBy('name')->get();
+
+    return view(
+        'events.calendar',
+        compact('events', 'spaces')
+    );
+}
+public function metrics()
+{
+    $totalEvents = Event::count();
+
+    $approvedEvents = Event::where(
+        'status',
+        'approved'
+    )->count();
+
+    $pendingEvents = Event::where(
+        'status',
+        'pending'
+    )->count();
+
+    $totalUsers = User::count();
+
+    $totalRegistrations = Registration::count();
+
+    $totalWaitlist = Waitlist::count();
+
+    $totalAttendances = Attendance::count();
+
+    $attendanceRate = $totalRegistrations > 0
+        ? round(
+            ($totalAttendances * 100) / $totalRegistrations,
+            2
+        )
+        : 0;
+        $eventMetrics = Event::withCount([
+    'registrations',
+    'attendances'
+])->get();
+$chartLabels = $eventMetrics->pluck('title');
+
+$chartData = $eventMetrics->map(function ($event) {
+
+    return $event->registrations_count > 0
+        ? round(
+            ($event->attendances_count * 100)
+            / $event->registrations_count,
+            2
+        )
+        : 0;
+
+});
+    return view('events.metrics', compact(
+        'totalEvents',
+        'approvedEvents',
+        'pendingEvents',
+        'totalUsers',
+        'totalRegistrations',
+        'totalWaitlist',
+        'totalAttendances',
+        'attendanceRate',
+        'eventMetrics',
+        'chartLabels',
+        'chartData'
+    ));
+}
+public function attendanceForm($id)
+{
+    $event = Event::findOrFail($id);
+
+    return view(
+        'events.attendance',
+        compact('event')
+    );
+}
+public function registerAttendance(Request $request, $id)
+{
+    $user = User::where(
+        'email',
+        $request->email
+    )->first();
+
+    if (!$user) {
+
+        return back()->with(
+            'error',
+            'No existe un usuario con ese correo.'
+        );
+    }
+
+    $registered = Registration::where(
+        'user_id',
+        $user->id
+    )
+    ->where(
+        'event_id',
+        $id
+    )
+    ->exists();
+
+    if (!$registered) {
+
+        return back()->with(
+            'error',
+            'El usuario no está inscrito en este evento.'
+        );
+    }
+
+    $alreadyExists = Attendance::where(
+        'user_id',
+        $user->id
+    )
+    ->where(
+        'event_id',
+        $id
+    )
+    ->exists();
+
+    if ($alreadyExists) {
+
+        return back()->with(
+            'error',
+            'La asistencia ya fue registrada.'
+        );
+    }
+
+    Attendance::create([
+        'user_id' => $user->id,
+        'event_id' => $id
+    ]);
+
+    return back()->with(
+        'success',
+        'Asistencia registrada correctamente.'
+    );
+}
+public function attendanceIndex()
+{
+    $events = Event::whereDate(
+            'event_date',
+            now()->toDateString()
+        )
+        ->where('status', 'approved');
+
+    if (auth()->user()->role !== 'admin') {
+
+        $events->where(
+            'user_id',
+            auth()->id()
+        );
+
+    }
+
+    $events = $events->get();
+
+    return view(
+        'attendance.index',
+        compact('events')
+    );
+}
+public function exportMetrics()
+{
+    $filename = 'reporte_eventos.csv';
+
+    $headers = [
+        'Content-Type' => 'text/csv',
+        'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+    ];
+
+    $callback = function () {
+
+        $file = fopen('php://output', 'w');
+
+        fputcsv($file, [
+            'Evento',
+            'Registrados',
+            'Asistencias',
+            'Porcentaje'
+        ]);
+
+        $events = Event::withCount([
+            'registrations',
+            'attendances'
+        ])->get();
+
+        foreach ($events as $event) {
+
+            $percent = $event->registrations_count > 0
+                ? round(
+                    ($event->attendances_count * 100)
+                    / $event->registrations_count,
+                    2
+                )
+                : 0;
+
+            fputcsv($file, [
+                $event->title,
+                $event->registrations_count,
+                $event->attendances_count,
+                $percent . '%'
+            ]);
+        }
+
+        fclose($file);
+    };
+
+    return response()->stream(
+        $callback,
+        200,
+        $headers
+    );
 }
 
 }
