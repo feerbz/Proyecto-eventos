@@ -1,94 +1,70 @@
 <x-app-layout>
-
-    <div class="max-w-2xl mx-auto p-6">
-
-        <h2 class="text-2xl font-bold mb-6">
-            Editar Espacio
+    <x-slot name="header">
+        <h2 class="font-black text-2xl text-gray-800 dark:text-white tracking-tighter">
+            Editar <span class="text-emerald-600">Espacio</span>
         </h2>
+    </x-slot>
 
-        <form
-            method="POST"
-            action="/spaces/{{ $space->id }}"
-            class="space-y-6">
+    <div class="py-12 bg-gray-50 dark:bg-gray-900 min-h-screen">
+        <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
+            
+            <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">
+                <form method="POST" action="/spaces/{{ $space->id }}" class="space-y-6">
+                    @csrf
+                    @method('PUT')
 
-            @csrf
-            @method('PUT')
+                    {{-- Nombre --}}
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Nombre del espacio</label>
+                        <input type="text" name="name" value="{{ $space->name }}"
+                               class="w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-emerald-500 focus:border-emerald-500 shadow-sm transition-colors">
+                    </div>
 
-            <div>
-                <label class="block text-sm font-medium mb-1">
-                    Nombre
-                </label>
+                    {{-- Capacidad --}}
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Capacidad</label>
+                        <input type="number" name="capacity" id="capacityInput" value="{{ $space->capacity }}"
+                               class="w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-emerald-500 focus:border-emerald-500 shadow-sm transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed">
+                    </div>
 
-                <input
-                    type="text"
-                    name="name"
-                    value="{{ $space->name }}"
-                    class="w-full rounded-xl border-gray-300">
+                    {{-- Checkbox --}}
+                    <div class="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                        <input type="checkbox" name="is_unlimited" id="unlimitedCheck"
+                               class="w-5 h-5 text-emerald-600 rounded focus:ring-emerald-500 border-gray-300"
+                               {{ $space->is_unlimited ? 'checked' : '' }}>
+                        <label for="unlimitedCheck" class="text-sm font-semibold text-gray-700 dark:text-gray-300 cursor-pointer">
+                            Sin límite de capacidad
+                        </label>
+                    </div>
+
+                    {{-- Botón --}}
+                    <div class="flex justify-end pt-4">
+                        <button type="submit" 
+                                class="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md transition-transform transform hover:-translate-y-0.5 focus:ring-4 focus:ring-emerald-500 focus:ring-opacity-50">
+                            Guardar cambios
+                        </button>
+                    </div>
+                </form>
             </div>
 
-            <div>
-                <label class="block text-sm font-medium mb-1">
-                    Capacidad
-                </label>
-
-                <input
-                    type="number"
-                    name="capacity"
-                    id="capacityInput"
-                    value="{{ $space->capacity }}"
-                    class="w-full rounded-xl border-gray-300">
-            </div>
-
-            <div class="flex items-center gap-2">
-
-                <input
-                    type="checkbox"
-                    name="is_unlimited"
-                    id="unlimitedCheck"
-                    {{ $space->is_unlimited ? 'checked' : '' }}>
-
-                <label for="unlimitedCheck">
-                    Sin límite de capacidad
-                </label>
-
-            </div>
-
-            <button
-                class="bg-emerald-600 text-white px-5 py-2 rounded-xl">
-
-                Guardar cambios
-
-            </button>
-
-        </form>
-
+        </div>
     </div>
 
+    <script>
+        const check = document.getElementById('unlimitedCheck');
+        const capacity = document.getElementById('capacityInput');
+
+        function updateCapacity() {
+            if (check.checked) {
+                capacity.value = '';
+                capacity.disabled = true;
+            } else {
+                capacity.disabled = false;
+            }
+        }
+
+        check.addEventListener('change', updateCapacity);
+        // Llamada inicial por si el espacio ya es ilimitado al cargar
+        updateCapacity();
+    </script>
 </x-app-layout>
-
-<script>
-
-const check =
-    document.getElementById('unlimitedCheck');
-
-const capacity =
-    document.getElementById('capacityInput');
-
-function updateCapacity() {
-
-    if (check.checked) {
-
-        capacity.value = '';
-        capacity.disabled = true;
-
-    } else {
-
-        capacity.disabled = false;
-    }
-}
-
-check.addEventListener('change', updateCapacity);
-
-updateCapacity();
-
-</script>
