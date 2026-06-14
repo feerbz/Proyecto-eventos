@@ -43,8 +43,12 @@
                     </x-dropdown-link>
                     <x-dropdown-link href="/calendario">
                         Calendario </x-dropdown-link>
+                    <x-dropdown-link href="/favoritos">
+                        Favoritos </x-dropdown-link>
+
                 </div>
             </div>
+
 
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">

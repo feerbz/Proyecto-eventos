@@ -9,9 +9,17 @@
     href="/metricas/exportar"
     class="bg-emerald-600 text-white px-4 py-2 rounded-xl inline-block mb-6">
 
-    Exportar Reporte
-    </a>
+    Exportar CSV
 
+</a>
+
+<a
+    href="/metricas/pdf"
+    class="bg-red-600 text-white px-4 py-2 rounded-xl inline-block mb-6 ml-2">
+
+    Exportar PDF
+
+</a>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 

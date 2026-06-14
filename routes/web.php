@@ -6,14 +6,30 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SpaceController;
 use App\Http\Controllers\CategoryController;
 
+Route::post(
+    '/events/{id}/favorite',
+    [EventController::class, 'favorite']
+);
 
+Route::delete(
+    '/events/{id}/favorite',
+    [EventController::class, 'unfavorite']
+);
+
+Route::get(
+    '/favoritos',
+    [EventController::class, 'favorites']
+);
 Route::get('/metricas', [EventController::class, 'metrics']);
 Route::delete('/events/{id}/waitlist', [EventController::class, 'leaveWaitlist']);
 Route::get(
     '/metricas/exportar',
     [EventController::class, 'exportMetrics']
 );
-
+Route::get(
+    '/metricas/pdf',
+    [EventController::class, 'exportMetricsPdf']
+);
 /* ---------------- PUBLICO ---------------- */
 Route::get('/', function () {
     return view('welcome');

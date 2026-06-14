@@ -57,12 +57,33 @@
                                                     </button>
                                                 </form>
 
-                                                <form method="POST" action="/events/{{ $event->id }}/reject">
-                                                    @csrf
-                                                    <button type="submit" class="p-2 bg-rose-100 dark:bg-rose-900/30 hover:bg-rose-500 text-rose-600 dark:text-rose-400 hover:text-white rounded-lg transition-all active:scale-95 shadow-sm shadow-rose-200 dark:shadow-none" title="Rechazar Evento">
-                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                                                    </button>
-                                                </form>
+                                                <form
+    method="POST"
+    action="/events/{{ $event->id }}/reject"
+    onsubmit="return askComment(this);">
+
+    @csrf
+
+    <input
+        type="hidden"
+        name="admin_comment"
+        class="admin-comment">
+
+    <button
+        type="submit"
+        class="p-2 bg-rose-100 dark:bg-rose-900/30 hover:bg-rose-500 text-rose-600 dark:text-rose-400 hover:text-white rounded-lg transition-all active:scale-95 shadow-sm shadow-rose-200 dark:shadow-none"
+        title="Rechazar Evento">
+
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M6 18L18 6M6 6l12 12" />
+        </svg>
+
+    </button>
+
+</form>
+                                                
+
                                             </div>
                                         </td>
                                     </tr>
@@ -87,4 +108,24 @@
             
         </div>
     </div>
+    <script>
+
+function askComment(form) {
+
+    let comment = prompt(
+        'Motivo del rechazo:'
+    );
+
+    if (comment === null || comment.trim() === '') {
+        return false;
+    }
+
+    form.querySelector('.admin-comment').value =
+        comment;
+
+    return true;
+}
+
+</script>
+
 </x-app-layout>

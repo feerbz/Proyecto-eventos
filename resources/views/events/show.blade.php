@@ -33,6 +33,25 @@
                                 {{ $event->description }}
                             </p>
                         </div>
+                        @if(
+    $event->status === 'rejected'
+    && $event->admin_comment
+)
+
+<div class="mt-6 bg-red-50 border border-red-200 rounded-2xl p-4">
+
+    <h3 class="font-bold text-red-700">
+        Comentario administrativo
+    </h3>
+
+    <p class="text-red-600 mt-2">
+        {{ $event->admin_comment }}
+    </p>
+
+</div>
+
+@endif
+
 
                         <div class="mt-10 h-64 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-[2rem] flex items-center justify-center overflow-hidden relative">
                              <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
@@ -85,16 +104,77 @@
 
                                     {{-- LÓGICA DE INSCRIPCIÓN INTEGRADA --}}
                                     @php
-                                        $inscrito = \App\Models\Registration::where('user_id', auth()->id())
-                                            ->where('event_id', $event->id)
-                                            ->exists();
-                                    @endphp
 
+$inscrito = \App\Models\Registration::where(
+    'user_id',
+    auth()->id()
+)
+->where(
+    'event_id',
+    $event->id
+)
+->exists();
+
+$favorito = \App\Models\Favorite::where(
+    'user_id',
+    auth()->id()
+)
+->where(
+    'event_id',
+    $event->id
+)
+->exists();
+
+@endphp
+
+
+
+<div class="mb-4">
+
+@if($favorito)
+
+<form
+    method="POST"
+    action="/events/{{ $event->id }}/favorite">
+
+    @csrf
+    @method('DELETE')
+
+    <button
+        class="w-full bg-red-50 text-red-600 hover:bg-red-500 hover:text-white font-bold py-3 rounded-2xl transition-all">
+
+        ❤️ Quitar de favoritos
+
+    </button>
+
+</form>
+
+@else
+
+<form
+    method="POST"
+    action="/events/{{ $event->id }}/favorite">
+
+    @csrf
+
+    <button
+        class="w-full bg-pink-50 text-pink-600 hover:bg-pink-500 hover:text-white font-bold py-3 rounded-2xl transition-all">
+
+        🤍 Agregar a favoritos
+
+    </button>
+
+</form>
+
+@endif
+
+</div>
                                     @if($inscrito)
                                         <div class="space-y-3">
                                             <div class="text-center bg-emerald-50 dark:bg-emerald-900/20 py-2 rounded-xl border border-emerald-100 dark:border-emerald-800">
                                                 <span class="text-emerald-600 dark:text-emerald-400 font-bold text-sm">✓ Ya tienes tu lugar</span>
                                             </div>
+                                        
                                             <form method="POST" action="/events/{{ $event->id }}/unregister">
                                                 @csrf
                                                 @method('DELETE')
@@ -116,6 +196,7 @@
                                             </button>
                                         </form>
                                     @endif
+
                                 </div>
                             </div>
                         </div>

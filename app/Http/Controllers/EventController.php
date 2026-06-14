@@ -11,6 +11,11 @@ use App\Models\Waitlist;
 use App\Models\User;
 use App\Models\Attendance;
 use Illuminate\Support\Facades\Mail;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Mail\RegistrationSuccessMail;
+use App\Mail\EventUpdatedMail;
+use App\Models\Favorite;
+
 
 class EventController extends Controller
 {
@@ -274,8 +279,21 @@ if ($end <= $start) {
     $event->categories()->sync(
         $request->categories ?? []
     );
+    $event->load(
+    'registrations.user',
+    'space'
+);
 
-    return redirect('/mis-eventos')
+foreach ($event->registrations as $registration) {
+
+    Mail::to(
+        $registration->user->email
+    )->send(
+        new EventUpdatedMail($event)
+    );
+
+}
+return redirect('/mis-eventos')
         ->with('success', 'Evento actualizado y enviado nuevamente a revisión');
 }
 
@@ -308,6 +326,9 @@ if ($end <= $start) {
             'user_id' => auth()->id(),
             'event_id' => $id,
         ]);
+        Mail::to(auth()->user()->email)
+    ->send(new RegistrationSuccessMail($event));
+
 
         return back()->with('success', 'Registrado');
     }
@@ -351,14 +372,22 @@ if ($end <= $start) {
         return back()->with('success', 'Evento aprobado');
     }
 
-    public function reject($id)
-    {
-        $event = Event::findOrFail($id);
-        $event->status = 'rejected';
-        $event->save();
+public function reject(Request $request, $id)
+{
+    $event = Event::findOrFail($id);
 
-        return back()->with('error', 'Evento rechazado');
-    }
+    $event->status = 'rejected';
+
+    $event->admin_comment =
+        $request->admin_comment;
+
+    $event->save();
+
+    return back()->with(
+        'error',
+        'Evento rechazado'
+    );
+}
 
     public function unregister($id)
 {
@@ -657,6 +686,104 @@ public function exportMetrics()
         $callback,
         200,
         $headers
+    );
+}
+public function exportMetricsPdf()
+{
+    $totalEvents = Event::count();
+
+    $totalUsers = User::count();
+
+    $totalRegistrations = Registration::count();
+
+    $totalAttendances = Attendance::count();
+
+    $attendanceRate = $totalRegistrations > 0
+        ? round(
+            ($totalAttendances * 100) / $totalRegistrations,
+            2
+        )
+        : 0;
+
+    $eventMetrics = Event::withCount([
+        'registrations',
+        'attendances'
+    ])->get();
+
+    $pdf = Pdf::loadView(
+        'pdf.metrics',
+        compact(
+            'totalEvents',
+            'totalUsers',
+            'totalRegistrations',
+            'totalAttendances',
+            'attendanceRate',
+            'eventMetrics'
+        )
+    );
+
+    return $pdf->download(
+        'Reporte_UniEvent.pdf'
+    );
+}
+public function favorite($id)
+{
+    $exists = Favorite::where(
+        'user_id',
+        auth()->id()
+    )
+    ->where(
+        'event_id',
+        $id
+    )
+    ->exists();
+
+    if (!$exists) {
+
+        Favorite::create([
+            'user_id' => auth()->id(),
+            'event_id' => $id
+        ]);
+
+    }
+
+    return back()->with(
+        'success',
+        'Evento agregado a favoritos'
+    );
+}
+
+public function unfavorite($id)
+{
+    Favorite::where(
+        'user_id',
+        auth()->id()
+    )
+    ->where(
+        'event_id',
+        $id
+    )
+    ->delete();
+
+    return back()->with(
+        'success',
+        'Evento eliminado de favoritos'
+    );
+}
+
+public function favorites()
+{
+    $events = Event::whereIn(
+        'id',
+        Favorite::where(
+            'user_id',
+            auth()->id()
+        )->pluck('event_id')
+    )->get();
+
+    return view(
+        'events.favorites',
+        compact('events')
     );
 }
 

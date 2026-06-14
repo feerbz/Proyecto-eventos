@@ -60,6 +60,10 @@ public function attendances()
 {
     return $this->hasMany(Attendance::class);
 }
+public function favorites()
+{
+    return $this->hasMany(Favorite::class);
+}
 
 }
 

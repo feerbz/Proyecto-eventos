@@ -66,6 +66,16 @@
 @forelse ($events as $event)
 
 @php
+    $favorito = \App\Models\Favorite::where(
+    'user_id',
+    auth()->id()
+)
+->where(
+    'event_id',
+    $event->id
+)
+->exists();
+
     $inscrito = \App\Models\Registration::where('user_id', auth()->id())
         ->where('event_id', $event->id)
         ->exists();
@@ -95,7 +105,14 @@
         <h3 class="text-lg font-bold">
             {{ $event->title }}
         </h3>
-        @if($event->categories->count())
+        <a
+    href="/events/{{ $event->id }}"
+    class="text-sm text-blue-600 hover:underline mb-2">
+
+    Ver detalle
+
+</a>
+@if($event->categories->count())
     <div class="flex flex-wrap gap-2 mt-2">
         @foreach($event->categories as $category)
             <span class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">
@@ -112,6 +129,44 @@
         <p class="text-sm text-gray-500 mb-3">
             {{ $event->description }}
         </p>
+        @if($favorito)
+
+<form
+    method="POST"
+    action="/events/{{ $event->id }}/favorite"
+    class="mb-3">
+
+    @csrf
+    @method('DELETE')
+
+    <button
+        class="text-red-500 font-bold">
+
+        ❤️ Favorito
+
+    </button>
+
+</form>
+
+@else
+
+<form
+    method="POST"
+    action="/events/{{ $event->id }}/favorite"
+    class="mb-3">
+
+    @csrf
+
+    <button
+        class="text-gray-500 font-bold">
+
+        🤍 Agregar a favoritos
+
+    </button>
+
+</form>
+
+@endif
 
         <p class="text-sm mb-2">
             📅 {{ \Carbon\Carbon::parse($event->event_date)->format('d M Y h:i A') }}

@@ -2,11 +2,9 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                {{ __('Mis Eventos Registrados') }}
+                {{ __('Mis favoritos') }}
             </h2>
-            <a href="/events/create" class="inline-flex items-center px-4 py-2 bg-emerald-600 border border-transparent rounded-xl font-bold text-xs text-white uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-md shadow-emerald-500/20">
-                + Nuevo Evento
-            </a>
+            
         </div>
     </x-slot>
 
@@ -87,21 +85,34 @@
                             </div>
                         </div>
 
-                        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-700 flex gap-3">
-                           <a href="/events/{{ $event->id }}/edit" 
-                         class="flex-1 text-center py-2 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 text-xs font-bold rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-700 dark:hover:text-emerald-400 hover:border-emerald-200 dark:hover:border-emerald-800 transition-all">
-                            Editar
-                            </a>    
-                            
-                            <form action="/events/{{ $event->id }}" method="POST" class="flex-1">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" onclick="return confirm('¿Seguro que quieres eliminar este evento?')" class="w-full py-2 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-xs font-bold rounded-lg hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors">
-                                    Eliminar
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+                        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-t flex gap-2">
+
+    <a
+        href="/events/{{ $event->id }}"
+        class="flex-1 text-center py-2 bg-blue-600 text-white rounded-lg font-bold">
+
+        Ver detalle
+
+    </a>
+
+    <form
+        method="POST"
+        action="/events/{{ $event->id }}/favorite"
+        class="flex-1">
+
+        @csrf
+        @method('DELETE')
+
+        <button
+            class="w-full py-2 bg-red-500 text-white rounded-lg font-bold">
+
+            ❤️ Quitar
+
+        </button>
+
+    </form>
+
+</div>
                 @empty
                     <div class="col-span-full bg-white dark:bg-gray-800 p-16 text-center rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700">
                         <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 mb-4">
