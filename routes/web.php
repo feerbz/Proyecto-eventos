@@ -6,6 +6,17 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SpaceController;
 use App\Http\Controllers\CategoryController;
 
+Route::get('/schema-check', function () {
+
+    return [
+        'favorites_exists' => Schema::hasTable('favorites'),
+        'events_columns' => Schema::getColumnListing('events'),
+        'favorites_columns' => Schema::hasTable('favorites')
+            ? Schema::getColumnListing('favorites')
+            : 'TABLA NO EXISTE',
+    ];
+});
+
 Route::post(
     '/events/{id}/favorite',
     [EventController::class, 'favorite']
