@@ -6,6 +6,16 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SpaceController;
 use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Artisan;
+
+Route::get('/run-migrations', function () {
+
+    Artisan::call('migrate', [
+        '--force' => true
+    ]);
+
+    return Artisan::output();
+});
 
 Route::get('/schema-check', function () {
 
