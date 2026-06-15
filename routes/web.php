@@ -5,6 +5,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SpaceController;
 use App\Http\Controllers\CategoryController;
+use Illuminate\Support\Facades\DB;
 
 Route::get('/schema-check', function () {
 
