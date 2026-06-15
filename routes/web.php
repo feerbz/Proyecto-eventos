@@ -11,10 +11,11 @@ Route::get('/schema-check', function () {
 
     return [
         'favorites_exists' => Schema::hasTable('favorites'),
-        'events_columns' => Schema::getColumnListing('events'),
-        'favorites_columns' => Schema::hasTable('favorites')
-            ? Schema::getColumnListing('favorites')
-            : 'TABLA NO EXISTE',
+        'admin_comment_exists' => Schema::hasColumn('events', 'admin_comment'),
+        'migrations' => DB::table('migrations')
+            ->orderByDesc('id')
+            ->limit(10)
+            ->get(),
     ];
 });
 
