@@ -305,33 +305,37 @@ return redirect('/mis-eventos')
     }
 
     /* ---------------- REGISTER ---------------- */
-    public function register($id)
-    {
-        $event = Event::with('space')->findOrFail($id);
-        $total = $event->registrations()->count();
+public function register($id)
+{
+    $event = Event::with('space')->findOrFail($id);
+    $total = $event->registrations()->count();
 
-        if (!$event->space?->is_unlimited && $total >= $event->capacity) {
-            return back()->with('error', 'Evento lleno');
-        }
-
-        $exists = Registration::where('user_id', auth()->id())
-            ->where('event_id', $id)
-            ->exists();
-
-        if ($exists) {
-            return back()->with('error', 'Ya estás registrado');
-        }
-
-        Registration::create([
-            'user_id' => auth()->id(),
-            'event_id' => $id,
-        ]);
-        Mail::to(auth()->user()->email)
-    ->send(new RegistrationSuccessMail($event));
-
-
-        return back()->with('success', 'Registrado');
+    if (
+        !is_null($event->capacity)
+        && !$event->space?->is_unlimited
+        && $total >= $event->capacity
+    ) {
+        return back()->with('error', 'Evento lleno');
     }
+
+    $exists = Registration::where('user_id', auth()->id())
+        ->where('event_id', $id)
+        ->exists();
+
+    if ($exists) {
+        return back()->with('error', 'Ya estás registrado');
+    }
+
+    Registration::create([
+        'user_id' => auth()->id(),
+        'event_id' => $id,
+    ]);
+
+    Mail::to(auth()->user()->email)
+        ->send(new RegistrationSuccessMail($event));
+
+    return back()->with('success', 'Registrado');
+}
 
     /* ---------------- MIS EVENTOS ---------------- */
     public function myEvents()

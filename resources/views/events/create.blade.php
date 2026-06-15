@@ -161,10 +161,11 @@
                 customField.style.display = 'none';
                 capacityInput.classList.add('bg-gray-50', 'cursor-not-allowed');
 
-                if (unlimited === '1') {
-                    capacityInput.value = '∞';
-                    capacityInput.setAttribute('readonly', true);
-                } else {
+if (unlimited === '1') {
+    capacityInput.value = '';
+    capacityInput.placeholder = 'Capacidad ilimitada';
+    capacityInput.setAttribute('readonly', true);
+} else {
                     capacityInput.value = capacity;
                     capacityInput.setAttribute('readonly', true);
                 }
