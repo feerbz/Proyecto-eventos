@@ -32,7 +32,11 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-    'name' => ['required', 'string', 'max:255'],
+    'name' => [
+    'required',
+    'regex:/^[\pL\s]+$/u',
+    'max:255'
+],
     'email' => [
         'required',
         'string',
@@ -40,15 +44,30 @@ class RegisteredUserController extends Controller
         'max:255',
         'unique:users',
         function ($attribute, $value, $fail) {
-            if (!str_ends_with($value, '.ipn.mx')) {
+
+            if (!preg_match('/@(.+\.)?ipn\.mx$/', $value)) {
                 $fail('Solo se permiten correos institucionales.');
             }
+
         },
     ],
 
-    'phone' => ['required', 'string', 'max:10'],
+    'phone' => [
+        'required',
+        'digits:10'
+    ],
 
-    'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
+    'password' => [
+        'required',
+        'confirmed',
+        \Illuminate\Validation\Rules\Password::defaults()
+    ],
+
+],
+[
+
+'phone.digits' => 'El formato del campo teléfono no es válido.',
+
 ]);
 $user = User::create([
     'name' => $request->name,

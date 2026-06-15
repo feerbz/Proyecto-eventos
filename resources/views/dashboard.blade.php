@@ -171,7 +171,7 @@
                                 @elseif(!is_null($event->capacity) && !$event->space?->is_unlimited && $total >= $event->capacity)
                                     <form method="POST" action="/events/{{ $event->id }}/waitlist">
                                         @csrf
-                                        <button class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white shadow-sm text-sm font-bold rounded-xl transition-colors">
+                                        <button class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-green shadow-sm text-sm font-bold rounded-xl transition-colors">
                                             Lista de espera
                                         </button>
                                     </form>
