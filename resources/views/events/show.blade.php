@@ -52,11 +52,34 @@
 
 @endif
 
+@if($event->image)
 
-                        <div class="mt-10 h-64 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-[2rem] flex items-center justify-center overflow-hidden relative">
-                             <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
-                             <svg class="w-20 h-20 text-white/20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                        </div>
+<div class="mt-10 rounded-[2rem] overflow-hidden shadow-lg">
+
+    <img
+        src="{{ asset('storage/' . $event->image) }}"
+        alt="{{ $event->title }}"
+        class="w-full h-64 object-cover">
+
+</div>
+
+@else
+
+<div class="mt-10 h-64 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-[2rem] flex items-center justify-center overflow-hidden relative">
+
+    <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+
+    <svg class="w-20 h-20 text-white/20"
+        fill="currentColor"
+        viewBox="0 0 24 24">
+
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+
+    </svg>
+
+</div>
+
+@endif
                     </div>
                 </div>
 
@@ -143,7 +166,7 @@ $favorito = \App\Models\Favorite::where(
     <button
         class="w-full bg-red-50 text-red-600 hover:bg-red-500 hover:text-white font-bold py-3 rounded-2xl transition-all">
 
-        ❤️ Quitar de favoritos
+         Quitar de favoritos
 
     </button>
 
@@ -160,7 +183,7 @@ $favorito = \App\Models\Favorite::where(
     <button
         class="w-full bg-pink-50 text-pink-600 hover:bg-pink-500 hover:text-white font-bold py-3 rounded-2xl transition-all">
 
-        🤍 Agregar a favoritos
+        Agregar a favoritos
 
     </button>
 

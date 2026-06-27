@@ -29,58 +29,53 @@ class RegisteredUserController extends Controller
      * @throws ValidationException
      */
     
-    public function store(Request $request): RedirectResponse
-    {
-        $request->validate([
-    'name' => [
-    'required',
-    'regex:/^[\pL\s]+$/u',
-    'max:255'
-],
-    'email' => [
-        'required',
-        'string',
-        'email',
-        'max:255',
-        'unique:users',
-        function ($attribute, $value, $fail) {
+public function store(Request $request): RedirectResponse
+{
+    $request->validate([
+        'name' => [
+            'required',
+            'regex:/^[\pL\s]+$/u',
+            'max:255'
+        ],
 
-            if (!preg_match('/@(.+\.)?ipn\.mx$/', $value)) {
-                $fail('Solo se permiten correos institucionales.');
-            }
+        'email' => [
+            'required',
+            'string',
+            'email',
+            'max:255',
+            'unique:users',
+        ],
 
-        },
-    ],
+        'phone' => [
+            'required',
+            'digits:10'
+        ],
 
-    'phone' => [
-        'required',
-        'digits:10'
-    ],
+        'password' => [
+            'required',
+            'confirmed',
+            \Illuminate\Validation\Rules\Password::defaults()
+        ],
 
-    'password' => [
-        'required',
-        'confirmed',
-        \Illuminate\Validation\Rules\Password::defaults()
-    ],
+    ], [
 
-],
-[
+        'name.regex' => 'El nombre solo puede contener letras y espacios.',
+        'phone.digits' => 'El formato del campo teléfono no es válido.',
 
-'phone.digits' => 'El formato del campo teléfono no es válido.',
+    ]);
 
-]);
-$user = User::create([
-    'name' => $request->name,
-    'email' => $request->email,
-    'phone' => $request->phone,
-    'password' => Hash::make($request->password),
-]);
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'phone' => $request->phone,
+        'password' => Hash::make($request->password),
+    ]);
 
-        event(new Registered($user));
+    event(new Registered($user));
 
-        Auth::login($user);
+    Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
-    }
+    return redirect(route('dashboard', absolute: false));
+}
     
 }

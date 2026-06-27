@@ -17,7 +17,12 @@ class ProfileUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => [
+            'required',
+            'string',
+            'max:255',
+            'regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/'
+                    ],
             'email' => [
                 'required',
                 'string',
@@ -28,4 +33,10 @@ class ProfileUpdateRequest extends FormRequest
             ],
         ];
     }
+    public function messages(): array
+{
+    return [
+        'name.regex' => 'El nombre debe contener al menos una letra.',
+    ];
+}
 }

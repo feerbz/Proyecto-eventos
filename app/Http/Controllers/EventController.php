@@ -23,6 +23,7 @@ class EventController extends Controller
 public function feed(Request $request)
 {
     $events = Event::where('status', 'approved')
+        ->where('event_date', '>=', now())
         ->with([
             'registrations',
             'user',
@@ -32,7 +33,7 @@ public function feed(Request $request)
 
     if ($request->category) {
         $events->whereHas('categories', function ($query) use ($request) {
-        $query->where('categories.id', $request->category);
+            $query->where('categories.id', $request->category);
         });
     }
 
@@ -57,18 +58,30 @@ public function feed(Request $request)
     /* ---------------- STORE ---------------- */
 public function store(Request $request)
 {
-$request->validate([
-    'title' => 'required|string',
-    'description' => 'required|string',
-    'event_date' => 'required|date',
+    $request->validate([
+    'title' => [
+    'required',
+    'string',
+    'regex:/.*[A-Za-zÁÉÍÓÚáéíóúÑñ].*/'
+],
+    'description' => [
+    'required',
+    'string',
+    'regex:/.*[A-Za-zÁÉÍÓÚáéíóúÑñ].*/'
+],
+    'event_date' => 'required|date|after:now',
     'end_time' => 'required|date_format:H:i',
     'capacity' => 'nullable|integer|min:1',
     'location' => 'nullable|string',
     'space_id' => 'nullable',
     'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
 ], [
-    'image.mimes' => 'La imagen debe ser JPG, PNG o WEBP',
-    'image.max' => 'La imagen no debe superar los 2MB',
+    'title.regex' => 'El título debe contener al menos una letra.',
+'description.regex' => 'La descripción debe contener al menos una letra.',
+    'title.regex' => 'El título debe contener al menos una letra.',
+    'event_date.after_or_equal' => 'La fecha del evento no puede ser anterior al día de hoy.',
+    'image.mimes' => 'La imagen debe ser JPG, PNG o WEBP.',
+    'image.max' => 'La imagen no debe superar los 2 MB.',
 ]);
 
     $spaceId = $request->space_id;
@@ -80,13 +93,38 @@ $request->validate([
     }
 
     // PARSEAR HORAS
-    $start = \Carbon\Carbon::parse($request->event_date);
-    $end = \Carbon\Carbon::parse($start->format('Y-m-d') . ' ' . $request->end_time);
+    // PARSEAR HORAS
+$start = \Carbon\Carbon::parse($request->event_date);
+$end = \Carbon\Carbon::parse($start->format('Y-m-d') . ' ' . $request->end_time);
 
-    // VALIDAR HORAS
-    if ($end <= $start) {
-        return back()->with('error', 'La hora de fin debe ser mayor a la de inicio')->withInput();
-    }
+// HORARIO PERMITIDO (7:00 - 22:00)
+$horaInicio = $start->format('H:i');
+$horaFin = $end->format('H:i');
+
+if ($horaInicio < '07:00' || $horaFin > '22:00') {
+    return back()
+        ->with('error', 'Los eventos solo pueden programarse entre las 07:00 y las 22:00 horas.')
+        ->withInput();
+}
+
+// VALIDAR HORAS
+// HORARIO PERMITIDO (07:00 - 22:00)
+if (
+    $start->hour < 7 ||
+    $start->hour >= 22 ||
+    $end->format('H:i') > '22:00'
+) {
+    return back()
+        ->with('error', 'Los eventos solo pueden programarse entre las 07:00 y las 22:00 horas.')
+        ->withInput();
+}
+
+// VALIDAR HORAS
+if ($end <= $start) {
+    return back()
+        ->with('error', 'La hora de fin debe ser mayor a la de inicio.')
+        ->withInput();
+}
 
     
     if ($spaceId) {
@@ -348,14 +386,17 @@ public function register($id)
     }
 
     /* ---------------- MIS INSCRIPCIONES ---------------- */
-    public function myRegistrations()
-    {
-        $registrations = Registration::where('user_id', auth()->id())
-            ->with('event')
-            ->get();
+public function myRegistrations()
+{
+    $registrations = Registration::where('user_id', auth()->id())
+        ->whereHas('event', function ($query) {
+            $query->where('event_date', '>=', now());
+        })
+        ->with('event')
+        ->get();
 
-        return view('events.my-registrations', compact('registrations'));
-    }
+    return view('events.my-registrations', compact('registrations'));
+}
 
     /* ---------------- PENDIENTES ---------------- */
     public function pending()

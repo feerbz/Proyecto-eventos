@@ -36,6 +36,7 @@
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Fecha y Hora *</label>
                                 <input type="datetime-local" name="event_date" value="{{ old('event_date') }}"
+                                <input type="datetime-local" name="event_date" value="{{ old('event_date') }}"
                                     class="w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-emerald-500 focus:border-emerald-500 shadow-sm transition-colors">
                                 @error('event_date') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
