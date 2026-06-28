@@ -399,14 +399,15 @@ public function myRegistrations()
 }
 
     /* ---------------- PENDIENTES ---------------- */
-    public function pending()
-    {
-        $events = Event::where('status', 'pending')
-            ->orderBy('event_date', 'asc')
-            ->get();
+ public function pending()
+{
+    $events = Event::with(['user', 'space'])
+        ->where('status', 'pending')
+        ->orderBy('event_date', 'asc')
+        ->get();
 
-        return view('events.pending', compact('events'));
-    }
+    return view('events.pending', compact('events'));
+}
 
     public function approve($id)
     {

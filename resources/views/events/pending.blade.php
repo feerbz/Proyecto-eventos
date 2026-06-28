@@ -24,29 +24,65 @@
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
-                                <tr class="border-b border-gray-100 dark:border-gray-700">
-                                    <th class="py-4 px-4 text-xs font-black text-gray-400 uppercase tracking-widest">Evento</th>
-                                    <th class="py-4 px-4 text-xs font-black text-gray-400 uppercase tracking-widest">Descripción</th>
-                                    <th class="py-4 px-4 text-xs font-black text-gray-400 uppercase tracking-widest text-center">Acciones</th>
-                                </tr>
-                            </thead>
+    <tr class="border-b border-gray-100 dark:border-gray-700">
+        <th class="py-4 px-4 text-xs font-black text-gray-400 uppercase tracking-widest">Título</th>
+        <th class="py-4 px-4 text-xs font-black text-gray-400 uppercase tracking-widest">Organizador</th>
+        <th class="py-4 px-4 text-xs font-black text-gray-400 uppercase tracking-widest">Fecha y hora</th>
+        <th class="py-4 px-4 text-xs font-black text-gray-400 uppercase tracking-widest">Ubicación</th>
+        <th class="py-4 px-4 text-xs font-black text-gray-400 uppercase tracking-widest">Aforo</th>
+        <th class="py-4 px-4 text-xs font-black text-gray-400 uppercase tracking-widest">Descripción</th>
+        <th class="py-4 px-4 text-xs font-black text-gray-400 uppercase tracking-widest text-center">Acciones</th>
+    </tr>
+</thead>
+
                             <tbody class="divide-y divide-gray-50 dark:divide-gray-700/50">
                                 
                                 @forelse ($events as $event)
                                     <tr class="group hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors">
-                                        <td class="py-6 px-4">
-                                            <div class="flex flex-col">
-                                                <span class="font-bold text-gray-900 dark:text-white group-hover:text-amber-500 transition-colors">
-                                                    {{ $event->title }}
-                                                </span>
-                                            </div>
-                                        </td>
-                                        
-                                        <td class="py-6 px-4 text-sm text-gray-600 dark:text-gray-400 font-medium max-w-md">
-                                            <p class="line-clamp-2" title="{{ $event->description }}">
-                                                {{ $event->description }}
-                                            </p>
-                                        </td>
+                                        {{-- TÍTULO --}}
+<td class="py-6 px-4">
+    <span class="font-bold text-gray-900 dark:text-white group-hover:text-amber-500 transition-colors">
+        {{ $event->title }}
+    </span>
+</td>
+
+{{-- ORGANIZADOR --}}
+<td class="py-6 px-4 text-sm">
+    {{ $event->user->name }}
+</td>
+
+{{-- FECHA Y HORA --}}
+<td class="py-6 px-4 text-sm">
+    <div class="flex flex-col">
+        <span>{{ \Carbon\Carbon::parse($event->event_date)->format('d/m/Y') }}</span>
+        <span class="text-xs text-gray-500">
+            {{ \Carbon\Carbon::parse($event->event_date)->format('H:i') }}
+            - {{ $event->end_time }}
+        </span>
+    </div>
+</td>
+
+{{-- UBICACIÓN --}}
+<td class="py-6 px-4 text-sm">
+    {{ $event->space?->name ?? $event->location }}
+</td>
+
+{{-- AFORO --}}
+<td class="py-6 px-4 text-sm">
+    @if($event->space?->is_unlimited)
+        Ilimitado
+    @else
+        {{ $event->capacity }}
+    @endif
+</td>
+
+{{-- DESCRIPCIÓN --}}
+<td class="py-6 px-4 text-sm text-gray-600 dark:text-gray-400 max-w-md">
+    <p class="line-clamp-2" title="{{ $event->description }}">
+        {{ $event->description }}
+    </p>
+</td>
+
                                         
                                         <td class="py-6 px-4">
                                             <div class="flex items-center justify-center gap-3">
