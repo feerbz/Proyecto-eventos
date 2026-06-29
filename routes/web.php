@@ -104,8 +104,13 @@ Route::get(
     Route::post('/events/{id}/approve', [EventController::class, 'approve']);
     Route::post('/events/{id}/reject', [EventController::class, 'reject']);
 
+    Route::get('/events/{id}/seat', [EventController::class, 'seatSelection'])
+    ->middleware('auth')
+    ->name('events.seat');
+
     // INSCRIPCIONES
-    Route::post('/events/{id}/register', [EventController::class, 'register']);
+    Route::post('/events/{id}/register', [EventController::class, 'register'])
+    ->name('events.register');
     Route::delete('/events/{id}/unregister', [EventController::class, 'unregister']);
 
     // CRUD EVENTOS

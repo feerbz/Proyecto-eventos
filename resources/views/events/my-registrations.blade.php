@@ -36,7 +36,7 @@
                         <div class="absolute top-0 left-0 w-full h-1.5 bg-emerald-500"></div>
 
                         <span class="inline-block px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-[10px] font-extrabold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest w-max mb-4 mt-2">
-                            {{ $reg->event->location }}
+                            {{ $reg->event->space?->name ?? $reg->event->location }}
                         </span>
 
                         <h3 class="text-lg font-black text-gray-900 dark:text-white mb-2">
@@ -47,9 +47,24 @@
                             {{ $reg->event->description }}
                         </p>
 
-                        <p class="text-sm mb-6 text-gray-700 dark:text-gray-300 font-medium bg-gray-50 dark:bg-gray-900/50 p-3 rounded-lg border border-gray-100 dark:border-gray-700">
-                            📅 {{ \Carbon\Carbon::parse($reg->event->event_date)->format('d M Y - h:i A') }}
-                        </p>
+<div class="mb-6 bg-gray-50 dark:bg-gray-900/50 p-3 rounded-lg border border-gray-100 dark:border-gray-700 space-y-2">
+
+    <p class="text-sm text-gray-700 dark:text-gray-300 font-medium">
+        📅 {{ \Carbon\Carbon::parse($reg->event->event_date)->format('d M Y - h:i A') }}
+    </p>
+
+    @if($reg->event->space?->has_seats)
+
+        <p class="text-sm text-gray-700 dark:text-gray-300 font-medium">
+            💺 Asiento:
+            <span class="font-black text-emerald-600 dark:text-emerald-400">
+                {{ $reg->seat_row }}{{ $reg->seat_number }}
+            </span>
+        </p>
+
+    @endif
+
+</div>
 
                         <div class="mt-auto border-t border-gray-100 dark:border-gray-700 pt-4">
                             <form method="POST" action="/events/{{ $reg->event->id }}/unregister">

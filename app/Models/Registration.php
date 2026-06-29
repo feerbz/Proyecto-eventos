@@ -15,11 +15,12 @@ class Registration extends Model
     {
         return $this->belongsTo(Event::class);
     }
-
     protected $fillable = [
-        'user_id',
-        'event_id',
-    ];
+    'user_id',
+    'event_id',
+    'seat_row',
+    'seat_number',
+];
 
 }
 

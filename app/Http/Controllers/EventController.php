@@ -31,19 +31,35 @@ public function feed(Request $request)
             'categories'
         ]);
 
-    if ($request->category) {
+    // Filtrar por categoría
+    if ($request->filled('category')) {
         $events->whereHas('categories', function ($query) use ($request) {
             $query->where('categories.id', $request->category);
         });
+    }
+
+    // Filtrar por fecha
+    if ($request->filled('date')) {
+        $events->whereDate('event_date', $request->date);
+    }
+
+    // Filtrar por espacio
+    if ($request->filled('space')) {
+        $events->where('space_id', $request->space);
     }
 
     $events = $events
         ->orderBy('event_date', 'asc')
         ->get();
 
-    $categories = \App\Models\Category::orderBy('name')->get();
+    $categories = Category::orderBy('name')->get();
+    $spaces = Space::orderBy('name')->get();
 
-    return view('dashboard', compact('events', 'categories'));
+    return view('dashboard', compact(
+        'events',
+        'categories',
+        'spaces'
+    ));
 }
 
     /* ---------------- CREATE ---------------- */
@@ -296,7 +312,7 @@ if ($end <= $start) {
             return back()
                 ->with('error', 'Ese espacio ya está ocupado en ese horario')
                 ->withInput();
-        }
+        
     }
 }
     $event->update([
@@ -334,6 +350,7 @@ foreach ($event->registrations as $registration) {
 return redirect('/mis-eventos')
         ->with('success', 'Evento actualizado y enviado nuevamente a revisión');
 }
+}
 
     /* ---------------- DELETE ---------------- */
     public function destroy($id)
@@ -343,9 +360,15 @@ return redirect('/mis-eventos')
     }
 
     /* ---------------- REGISTER ---------------- */
-public function register($id)
+public function register(Request $request, $id)
 {
     $event = Event::with('space')->findOrFail($id);
+
+    return $this->performRegistration($event, $request);
+}
+
+private function performRegistration(Event $event, Request $request)
+{
     $total = $event->registrations()->count();
 
     if (
@@ -357,22 +380,38 @@ public function register($id)
     }
 
     $exists = Registration::where('user_id', auth()->id())
-        ->where('event_id', $id)
+        ->where('event_id', $event->id)
         ->exists();
 
     if ($exists) {
         return back()->with('error', 'Ya estás registrado');
     }
+    // Validar asiento (solo para espacios con selección de asientos)
+if ($event->space?->has_seats) {
 
-    Registration::create([
-        'user_id' => auth()->id(),
-        'event_id' => $id,
-    ]);
+    $seatExists = Registration::where('event_id', $event->id)
+        ->where('seat_row', $request->seat_row)
+        ->where('seat_number', $request->seat_number)
+        ->exists();
+
+    if ($seatExists) {
+        return back()->with('error', 'Ese asiento ya fue seleccionado por otro usuario.');
+    }
+
+}
+Registration::create([
+    'user_id' => auth()->id(),
+    'event_id' => $event->id,
+    'seat_row' => $request->seat_row,
+    'seat_number' => $request->seat_number,
+]);
 
     Mail::to(auth()->user()->email)
         ->send(new RegistrationSuccessMail($event));
 
-    return back()->with('success', 'Registrado');
+    return redirect()
+        ->route('dashboard')
+        ->with('success', 'Registrado');
 }
 
     /* ---------------- MIS EVENTOS ---------------- */
@@ -832,7 +871,23 @@ public function favorites()
         compact('events')
     );
 }
+public function seatSelection(Request $request, $id)
+{
+    $event = Event::with('space')->findOrFail($id);
+    if (!$event->space || !$event->space->has_seats) {
+    return $this->performRegistration($event, $request);
+}
+$occupiedSeats = Registration::where('event_id', $event->id)
+    ->get(['seat_row', 'seat_number']);
+
+return view(
+    'events.seat-selection',
+    compact('event', 'occupiedSeats')
+);
 
 }
+}
+
+
 
 

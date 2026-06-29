@@ -28,28 +28,52 @@
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-gray-50 dark:bg-gray-900/50 text-gray-600 dark:text-gray-400 uppercase text-xs font-bold tracking-wider">
-                            <th class="px-8 py-5">Nombre de la categoría</th>
-                            <th class="px-8 py-5 text-right">Acciones</th>
+                        <th class="px-8 py-5">ID</th>
+                        <th class="px-8 py-5">Nombre de la categoría</th>
+                        <th class="px-8 py-5">Eventos asociados</th>
+                        <th class="px-8 py-5 text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                         @foreach($categories as $category)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors group">
-                                <td class="px-8 py-5 font-bold text-gray-900 dark:text-white">
-                                    {{ $category->name }}
-                                </td>
-                                <td class="px-8 py-5 text-right">
-                                    <form action="/categories/{{ $category->id }}" method="POST" onsubmit="return confirm('¿Eliminar categoría?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" 
-                                                class="px-3 py-1.5 bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400 rounded-lg text-xs font-bold hover:bg-red-100 transition-colors">
-                                            Eliminar
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @endforeach
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors group">
+
+    <td class="px-8 py-5 font-semibold text-gray-500">
+        {{ $category->id }}
+    </td>
+
+    <td class="px-8 py-5 font-bold text-gray-900 dark:text-white">
+        {{ $category->name }}
+    </td>
+
+    <td class="px-8 py-5 text-center">
+        {{ $category->events_count }}
+    </td>
+
+    <td class="px-8 py-5">
+        <div class="flex justify-center">
+
+            <form action="/categories/{{ $category->id }}" method="POST"
+                  onsubmit="return confirm('¿Eliminar categoría?')">
+
+                @csrf
+                @method('DELETE')
+
+                <button
+                    type="submit"
+                    class="px-3 py-1.5 bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400 rounded-lg text-xs font-bold hover:bg-red-100 transition-colors">
+
+                    Eliminar
+
+                </button>
+
+            </form>
+
+        </div>
+    </td>
+
+</tr>
+@endforeach
                     </tbody>
                 </table>
             </div>

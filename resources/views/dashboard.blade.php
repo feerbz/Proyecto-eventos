@@ -37,21 +37,62 @@
     <div class="py-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
-            {{-- FILTRO --}}
-            <form method="GET" action="{{ route('dashboard') }}" class="mb-8 bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center gap-4">
-                <label class="text-sm font-bold text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                    Filtro rápido:
-                </label>
-                <select name="category" onchange="this.form.submit()"
-                    class="w-full sm:w-64 rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-emerald-500 focus:border-emerald-500 text-sm font-medium transition-colors">
-                    <option value="">Todas las categorías</option>
-                    @foreach($categories as $category)
-                        <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
-                            {{ $category->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </form>
+           {{-- FILTRO --}}
+<form method="GET" action="{{ route('dashboard') }}"
+      class="mb-8 bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col lg:flex-row lg:items-center gap-4">
+
+    <label class="text-sm font-bold text-gray-700 dark:text-gray-300 whitespace-nowrap">
+        Filtro rápido:
+    </label>
+
+    {{-- Categoría --}}
+    <select name="category"
+            onchange="this.form.submit()"
+            class="w-full lg:w-64 rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-emerald-500 focus:border-emerald-500 text-sm">
+
+        <option value="">Todas las categorías</option>
+
+        @foreach($categories as $category)
+            <option value="{{ $category->id }}"
+                {{ request('category') == $category->id ? 'selected' : '' }}>
+                {{ $category->name }}
+            </option>
+        @endforeach
+
+    </select>
+
+    {{-- Fecha --}}
+    <input
+        type="date"
+        name="date"
+        value="{{ request('date') }}"
+        onchange="this.form.submit()"
+        class="w-full lg:w-52 rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-emerald-500 focus:border-emerald-500 text-sm">
+
+    {{-- Espacio --}}
+    <select
+        name="space"
+        onchange="this.form.submit()"
+        class="w-full lg:w-64 rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-emerald-500 focus:border-emerald-500 text-sm">
+
+        <option value="">Todos los espacios</option>
+
+        @foreach($spaces as $space)
+            <option value="{{ $space->id }}"
+                {{ request('space') == $space->id ? 'selected' : '' }}>
+                {{ $space->name }}
+            </option>
+        @endforeach
+
+    </select>
+
+    {{-- Limpiar filtros --}}
+    <a href="{{ route('dashboard') }}"
+       class="text-center px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+        Limpiar
+    </a>
+
+</form>
 
             {{-- GRID DE EVENTOS --}}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -175,15 +216,14 @@
                                             Lista de espera
                                         </button>
                                     </form>
+                                    @else
+    <a href="{{ route('events.seat', $event->id) }}"
+       class="inline-block px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-md text-sm font-bold rounded-xl transition-transform transform hover:-translate-y-0.5 text-center">
 
-                                @else
-                                    <form method="POST" action="/events/{{ $event->id }}/register">
-                                        @csrf
-                                        <button class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-md text-sm font-bold rounded-xl transition-transform transform hover:-translate-y-0.5">
-                                            Inscribirme
-                                        </button>
-                                    </form>
-                                @endif
+        Inscribirme
+
+    </a>
+@endif
                             </div>
 
                         </div>
