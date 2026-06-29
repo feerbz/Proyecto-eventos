@@ -8,16 +8,12 @@ use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
 
-Route::get('/schema-check', function () {
+Route::get('/run-migrations', function () {
 
-    return [
-        'favorites_exists' => Schema::hasTable('favorites'),
-        'admin_comment_exists' => Schema::hasColumn('events', 'admin_comment'),
-        'migrations' => DB::table('migrations')
-            ->orderByDesc('id')
-            ->limit(10)
-            ->get(),
-    ];
+    Artisan::call('migrate', ['--force' => true]);
+
+    return nl2br(Artisan::output());
+
 });
 
 Route::get('/schema-check', function () {
@@ -150,6 +146,9 @@ Route::get(
     }
 
     return response()->file($path);
+});
+Route::get('/hola', function () {
+    return 'Hola AWS';
 });
 
 
