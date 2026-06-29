@@ -20,6 +20,18 @@ Route::get('/schema-check', function () {
     ];
 });
 
+Route::get('/schema-check', function () {
+
+    return [
+        'favorites_exists' => Schema::hasTable('favorites'),
+        'admin_comment_exists' => Schema::hasColumn('events', 'admin_comment'),
+        'migrations' => DB::table('migrations')
+            ->orderByDesc('id')
+            ->limit(10)
+            ->get(),
+    ];
+});
+
 Route::post(
     '/events/{id}/favorite',
     [EventController::class, 'favorite']
