@@ -30,6 +30,10 @@ return [
         ->orderByDesc('id')
         ->limit(10)
         ->get(),
+    'has_seats_exists' => Schema::hasColumn('spaces', 'has_seats'),
+    'seat_row_exists' => Schema::hasColumn('registrations', 'seat_row'),
+
+    'seat_number_exists' => Schema::hasColumn('registrations', 'seat_number'),
 
 ];
 });
