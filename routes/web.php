@@ -18,14 +18,20 @@ Route::get('/run-migrations', function () {
 
 Route::get('/schema-check', function () {
 
-    return [
-        'favorites_exists' => Schema::hasTable('favorites'),
-        'admin_comment_exists' => Schema::hasColumn('events', 'admin_comment'),
-        'migrations' => DB::table('migrations')
-            ->orderByDesc('id')
-            ->limit(10)
-            ->get(),
-    ];
+return [
+
+    'favorites_exists' => Schema::hasTable('favorites'),
+
+    'admin_comment_exists' => Schema::hasColumn('events', 'admin_comment'),
+
+    'spaces' => DB::table('spaces')->get(),
+
+    'migrations' => DB::table('migrations')
+        ->orderByDesc('id')
+        ->limit(10)
+        ->get(),
+
+];
 });
 
 Route::post(
