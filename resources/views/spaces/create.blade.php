@@ -9,26 +9,63 @@
         <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
             
             <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">
+                @if ($errors->any())
+    <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-xl">
+        <ul class="list-disc list-inside">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
                 <form method="POST" action="/spaces" class="space-y-6">
                     @csrf
 
-                    {{-- Nombre --}}
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Nombre del espacio</label>
-                        <input type="text" name="name" placeholder="Ej. Auditorio A" required
-                               class="w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-emerald-500 focus:border-emerald-500 shadow-sm transition-colors">
-                    </div>
+{{-- Nombre --}}
+<div>
+    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+        Nombre del espacio
+    </label>
 
-                    {{-- Capacidad --}}
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Capacidad</label>
-                        <input type="number" name="capacity" id="capacityInput" placeholder="Ej. 100"
-                               class="w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-emerald-500 focus:border-emerald-500 shadow-sm transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed">
-                    </div>
+    <input
+        type="text"
+        name="name"
+        value="{{ old('name') }}"
+        placeholder="Ej. Auditorio A"
+        required
+        class="w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-emerald-500 focus:border-emerald-500 shadow-sm transition-colors">
+
+    @error('name')
+        <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
+    @enderror
+</div>
+
+{{-- Capacidad --}}
+<div>
+    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+        Capacidad
+    </label>
+
+    <input
+        type="number"
+        name="capacity"
+        id="capacityInput"
+        value="{{ old('capacity') }}"
+        placeholder="Ej. 100"
+        class="w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-emerald-500 focus:border-emerald-500 shadow-sm transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed">
+
+    @error('capacity')
+        <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
+    @enderror
+</div>
 
                     {{-- Checkbox --}}
                     <div class="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                        <input type="checkbox" name="is_unlimited" id="unlimitedCheck"
+                        <input
+    type="checkbox"
+    name="is_unlimited"
+    id="unlimitedCheck"
+    {{ old('is_unlimited') ? 'checked' : '' }}
                                class="w-5 h-5 text-emerald-600 rounded focus:ring-emerald-500 border-gray-300">
                         <label for="unlimitedCheck" class="text-sm font-semibold text-gray-700 dark:text-gray-300 cursor-pointer">
                             Sin límite de capacidad
@@ -62,5 +99,6 @@
         }
 
         check.addEventListener('change', updateCapacity);
+         updateCapacity();
     </script>
 </x-app-layout>

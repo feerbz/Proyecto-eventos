@@ -174,11 +174,15 @@
                                 </div>
                                 <div class="flex items-center text-sm font-medium text-gray-600 dark:text-gray-300">
                                     <span class="text-emerald-500 mr-2 text-lg">👥</span>
-                                    @if(($event->space && $event->space->is_unlimited) || is_null($event->capacity))
-                                        Cupo Ilimitado
-                                    @else
-                                        {{ $total }} / {{ $event->capacity }} inscritos
-                                    @endif
+                                    @php
+    $capacity = $event->space?->capacity ?? $event->capacity;
+@endphp
+
+@if(($event->space && $event->space->is_unlimited) || is_null($capacity))
+    Cupo Ilimitado
+@else
+    {{ $total }} / {{ $capacity }} inscritos
+@endif
                                 </div>
                             </div>
 
@@ -207,9 +211,12 @@
                                         <button class="px-4 py-2 bg-orange-100 hover:bg-orange-200 text-orange-700 text-sm font-bold rounded-xl transition-colors">
                                             Salir de espera
                                         </button>
-                                    </form>
-
-                                @elseif(!is_null($event->capacity) && !$event->space?->is_unlimited && $total >= $event->capacity)
+</form>
+@elseif(
+    !is_null($capacity)
+    && !$event->space?->is_unlimited
+    && $total >= $capacity
+)
                                     <form method="POST" action="/events/{{ $event->id }}/waitlist">
                                         @csrf
                                         <button class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-green shadow-sm text-sm font-bold rounded-xl transition-colors">

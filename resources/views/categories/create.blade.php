@@ -9,6 +9,21 @@
         <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
             
             <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">
+                    <div class="py-12 bg-gray-50 dark:bg-gray-900 min-h-screen">
+        <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
+            
+            <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">
+                @if ($errors->any())
+    <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-xl">
+        <ul class="list-disc list-inside">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+                <form method="POST" action="/spaces" class="space-y-6">
+                    @csrf
                 <form method="POST" action="/categories" class="space-y-6">
                     @csrf
 

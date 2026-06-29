@@ -18,16 +18,28 @@ class CategoryController extends Controller
     {
         return view('categories.create');
     }
-
     public function store(Request $request)
-    {
-        Category::create([
-            'name' => $request->name,
-        ]);
+{
+    $request->validate([
+        'name' => [
+            'required',
+            'string',
+            'max:255',
+            'regex:/.*[A-Za-zÁÉÍÓÚáéíóúÑñ].*/',
+        ],
+    ], [
+        'name.required' => 'El nombre de la categoría es obligatorio.',
+        'name.regex' => 'La categoría debe contener al menos una letra.',
+        'name.max' => 'La categoría no puede tener más de 255 caracteres.',
+    ]);
 
-        return redirect('/categories')
-            ->with('success', 'Categoría creada');
-    }
+    Category::create([
+        'name' => $request->name,
+    ]);
+
+    return redirect('/categories')
+        ->with('success', 'Categoría creada');
+}
 
     public function destroy($id)
     {

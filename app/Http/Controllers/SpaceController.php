@@ -13,15 +13,47 @@ class SpaceController extends Controller
     }
 
     public function store(Request $request)
-    {
-        Space::create([
-            'name' => $request->name,
-            'capacity' => $request->capacity,
-            'is_unlimited' => $request->has('is_unlimited'),
-        ]);
+{
+    $request->validate([
+        'name' => [
+            'required',
+            'string',
+            'max:255',
+            'not_regex:/^[0-9]+$/',
+        ],
+        'capacity' => [
+            'nullable',
+            'integer',
+            'min:1',
+        ],
+    ], [
+        'name.required' => 'El nombre del espacio es obligatorio.',
+        'name.not_regex' => 'El nombre del espacio no puede contener únicamente números.',
+        'capacity.integer' => 'La capacidad debe ser un número entero.',
+        'capacity.min' => 'La capacidad debe ser mayor que 0.',
+    ]);
 
-        return redirect('/dashboard')->with('success', 'Espacio creado');
+    if (!$request->has('is_unlimited') && !$request->filled('capacity')) {
+        return back()
+            ->withErrors([
+                'capacity' => 'La capacidad es obligatoria si el espacio no es ilimitado.'
+            ])
+            ->withInput();
     }
+
+    Space::create([
+        'name' => $request->name,
+        'capacity' => $request->has('is_unlimited')
+            ? null
+            : $request->capacity,
+        'is_unlimited' => $request->has('is_unlimited'),
+    ]);
+
+    return redirect('/dashboard')
+        ->with('success', 'Espacio creado');
+}
+
+
     public function index()
 {
     $spaces = Space::all();
@@ -36,15 +68,37 @@ public function edit($id)
     return view('spaces.edit', compact('space'));
 }
 
+
 public function update(Request $request, $id)
 {
-    $space = Space::findOrFail($id);
-
-    $space->update([
-        'name' => $request->name,
-        'capacity' => $request->capacity,
-        'is_unlimited' => $request->has('is_unlimited'),
+    $request->validate([
+        'name' => [
+            'required',
+            'string',
+            'max:255',
+            'not_regex:/^[0-9]+$/',
+        ],
+        'capacity' => [
+    'nullable',
+    'integer',
+    'min:1',
+],
+    ], [
+        'name.required' => 'El nombre del espacio es obligatorio.',
+        'name.not_regex' => 'El nombre del espacio no puede contener solamente numeros',
+        'capacity.required_unless' => 'La capacidad es obligatoria si el espacio no es ilimitado.',
+        'capacity.integer' => 'La capacidad debe ser un número entero.',
+        'capacity.min' => 'La capacidad debe ser mayor que 0.',
     ]);
+
+    $space = Space::findOrFail($id);
+    $space->update([
+    'name' => $request->name,
+    'capacity' => $request->has('is_unlimited')
+        ? null
+        : $request->capacity,
+    'is_unlimited' => $request->has('is_unlimited'),
+]);
 
     return redirect('/spaces')
         ->with('success', 'Espacio actualizado');

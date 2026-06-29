@@ -10,28 +10,29 @@
 
         <div class="bg-white dark:bg-[#1e293b] rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 p-8 md:p-12">
 
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-black text-slate-800 dark:text-white tracking-tight mb-3">
-                    {{ $event->title }}
-                </h2>
-                <p class="text-slate-500 dark:text-slate-400">
-                    Selecciona un asiento disponible para completar tu inscripción.
-                </p>
-            </div>
 
-            @php
-                $capacity = $event->capacity ?? 50;
-                $columns = 10;
-                $rows = ceil($capacity / $columns);
-            @endphp
+<div class="text-center mb-12">
+    <h2 class="text-3xl font-black text-slate-800 dark:text-white tracking-tight mb-3">
+        {{ $event->title }}
+    </h2>
+    <p class="text-slate-500 dark:text-slate-400">
+        Selecciona un asiento disponible para completar tu inscripción.
+    </p>
+</div>
 
-            <div class="max-w-2xl mx-auto mb-16 relative">
-                <div class="bg-gradient-to-b from-slate-800 to-[#1e293b] border-t-4 border-emerald-500 rounded-t-[100px] shadow-[0_-15px_40px_-10px_rgba(16,185,129,0.2)] text-center py-6">
-                    <span class="text-emerald-500 font-black tracking-[0.3em] text-sm uppercase">
-                        Escenario
-                    </span>
-                </div>
-            </div>
+@php
+    $capacity = $event->space?->capacity ?? $event->capacity ?? 50;
+    $columns = 10;
+    $rows = ceil($capacity / $columns);
+@endphp
+
+<div class="max-w-2xl mx-auto mb-16 relative">
+    <div class="bg-gradient-to-b from-slate-800 to-[#1e293b] border-t-4 border-emerald-500 rounded-t-[100px] shadow-[0_-15px_40px_-10px_rgba(16,185,129,0.2)] text-center py-6">
+        <span class="text-emerald-500 font-black tracking-[0.3em] text-sm uppercase">
+            Escenario
+        </span>
+    </div>
+</div>
 
             <div class="overflow-x-auto pb-8">
                 <div class="flex flex-col items-center gap-4 min-w-[600px]">
