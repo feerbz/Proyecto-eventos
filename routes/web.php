@@ -7,6 +7,7 @@ use App\Http\Controllers\SpaceController;
 use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schema;
 
 Route::get('/run-migrations', function () {
 
@@ -157,9 +158,7 @@ Route::get(
 
     return response()->file($path);
 });
-Route::get('/hola', function () {
-    return 'Hola AWS';
-});
+
 
 
 require __DIR__.'/auth.php';
