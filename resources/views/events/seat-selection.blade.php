@@ -1,196 +1,155 @@
 <x-app-layout>
 
     <x-slot name="header">
-        <h2 class="font-bold text-2xl">
+        <h2 class="font-bold text-2xl text-slate-800 dark:text-slate-200">
             Selección de asiento
         </h2>
     </x-slot>
 
-    <div class="max-w-5xl mx-auto py-10">
+    <div class="max-w-5xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
 
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-8">
+        <!-- Contenedor Principal Dark Mode -->
+        <div class="bg-white dark:bg-[#1e293b] rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 p-8 md:p-12">
 
-            <h2 class="text-2xl font-bold mb-3">
-                {{ $event->title }}
-            </h2>
-
-            <p class="text-gray-500 mb-8">
-                Selecciona un asiento para completar tu inscripción.
-            </p>
+            <!-- Encabezado de la Tarjeta -->
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-black text-slate-800 dark:text-white tracking-tight mb-3">
+                    {{ $event->title }}
+                </h2>
+                <p class="text-slate-500 dark:text-slate-400">
+                    Selecciona un asiento disponible para completar tu inscripción.
+                </p>
+            </div>
 
             @php
+                $capacity = $event->capacity ?? 50;
+                $columns = 10;
+                $rows = ceil($capacity / $columns);
+            @endphp
 
-    $capacity = $event->capacity ?? 50;
-
-    $columns = 10;
-
-    $rows = ceil($capacity / $columns);
-
-@endphp
-
-
-            <div class="bg-gray-900 text-white rounded-lg text-center py-3 mb-10 font-bold">
-                ESCENARIO
+            <!-- Área del Escenario (Diseño Curvo Iluminado) -->
+            <div class="max-w-2xl mx-auto mb-16 relative">
+                <div class="bg-gradient-to-b from-slate-800 to-[#1e293b] border-t-4 border-emerald-500 rounded-t-[100px] shadow-[0_-15px_40px_-10px_rgba(16,185,129,0.2)] text-center py-6">
+                    <span class="text-emerald-500 font-black tracking-[0.3em] text-sm uppercase">
+                        Escenario
+                    </span>
+                </div>
             </div>
-            <div class="flex flex-col items-center gap-4">
 
-    @for($row = 0; $row < $rows; $row++)
+            <!-- Grid de Asientos con Scroll Horizontal en Móviles -->
+            <div class="overflow-x-auto pb-8">
+                <div class="flex flex-col items-center gap-4 min-w-[600px]">
 
-        <div class="flex gap-2">
+                    @for($row = 0; $row < $rows; $row++)
+                        <div class="flex gap-3">
+                            @for($seat = 1; $seat <= $columns; $seat++)
+                                @php
+                                    $number = ($row * $columns) + $seat;
+                                    if($number > $capacity) break;
+                                    $letter = chr(65 + $row);
+                                    
+                                    $occupied = $occupiedSeats->contains(function ($item) use ($letter, $seat) {
+                                        return $item->seat_row == $letter && $item->seat_number == $seat;
+                                    });
+                                @endphp
 
-            @for($seat = 1; $seat <= $columns; $seat++)
+                                <button
+                                    type="button"
+                                    data-row="{{ $letter }}"
+                                    data-seat="{{ $seat }}"
+                                    {{ $occupied ? 'disabled' : '' }}
+                                    class="seat relative w-12 h-12 md:w-14 md:h-14 rounded-t-2xl rounded-b-md font-bold text-sm md:text-base transition-all duration-200 border-b-4 flex items-center justify-center
+                                    {{ $occupied
+                                        ? 'bg-slate-800 border-slate-900 text-slate-600 cursor-not-allowed opacity-60'
+                                        : 'bg-slate-700 border-slate-800 text-slate-300 hover:bg-emerald-500 hover:border-emerald-700 hover:text-white hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/30 cursor-pointer'
+                                    }}">
+                                    {{ $letter }}{{ $seat }}
+                                </button>
+                            @endfor
+                        </div>
+                    @endfor
 
-                @php
+                </div>
+            </div>
 
-                    $number = ($row * $columns) + $seat;
+            <!-- Leyenda de Colores -->
+            <div class="flex flex-wrap items-center justify-center gap-8 mt-4 border-t border-slate-200 dark:border-slate-800 pt-8 mb-10">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-t-xl rounded-b-sm bg-slate-700 border-b-4 border-slate-800 shadow-sm"></div>
+                    <span class="text-sm font-medium text-slate-600 dark:text-slate-400">Disponible</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-t-xl rounded-b-sm bg-emerald-500 border-b-4 border-emerald-700 shadow-md shadow-emerald-500/30"></div>
+                    <span class="text-sm font-medium text-slate-600 dark:text-slate-400">Seleccionado</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-t-xl rounded-b-sm bg-slate-800 border-b-4 border-slate-900 opacity-60"></div>
+                    <span class="text-sm font-medium text-slate-600 dark:text-slate-400">Ocupado</span>
+                </div>
+            </div>
 
+            <!-- Panel Inferior: Confirmación -->
+            <div class="mt-8 bg-slate-50 dark:bg-[#1a2333] rounded-2xl p-8 border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6">
+                
+                <div class="text-center md:text-left">
+                    <h3 class="font-medium text-sm text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                        Asiento seleccionado
+                    </h3>
+                    <p id="selectedSeat" class="text-emerald-500 text-4xl font-black mt-1">
+                        --
+                    </p>
+                </div>
 
-                    if($number > $capacity) break;
+                <form method="POST" action="{{ route('events.register', $event->id) }}" class="w-full md:w-auto m-0">
+                    @csrf
+                    <input type="hidden" id="seatRow" name="seat_row">
+                    <input type="hidden" id="seatNumber" name="seat_number">
 
-                    $letter = chr(65 + $row);
+                    <button
+                        id="confirmButton"
+                        disabled
+                        class="w-full md:w-auto px-10 py-4 rounded-xl bg-emerald-600 text-white font-bold tracking-wide transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-700 hover:bg-emerald-500 hover:shadow-lg hover:shadow-emerald-500/30 hover:-translate-y-1">
+                        Confirmar inscripción
+                    </button>
+                </form>
 
-                @endphp
-                @php
+            </div>
 
-    $occupied = $occupiedSeats->contains(function ($item) use ($letter, $seat) {
+        </div> {{-- Se cierra la tarjeta principal --}}
 
-        return $item->seat_row == $letter
-            && $item->seat_number == $seat;
+    </div> {{-- Se cierra el contenedor max-w --}}
 
-    });
+    <script>
+        let selected = null;
+        const buttons = document.querySelectorAll('.seat');
+        const text = document.getElementById('selectedSeat');
+        const confirm = document.getElementById('confirmButton');
 
-@endphp
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                
+                // 1. Limpiar los estilos del asiento previamente seleccionado (ignorando los ocupados)
+                buttons.forEach(b => {
+                    if(!b.disabled) {
+                        b.classList.remove('bg-emerald-500', 'border-emerald-700', 'text-white', 'shadow-lg', 'shadow-emerald-500/30', '-translate-y-1', 'scale-105');
+                        b.classList.add('bg-slate-700', 'border-slate-800', 'text-slate-300');
+                    }
+                });
 
+                // 2. Aplicar los estilos al asiento clickeado
+                button.classList.remove('bg-slate-700', 'border-slate-800', 'text-slate-300');
+                button.classList.add('bg-emerald-500', 'border-emerald-700', 'text-white', 'shadow-lg', 'shadow-emerald-500/30', '-translate-y-1', 'scale-105');
 
-    <button
-        type="button"
-        data-row="{{ $letter }}"
-        data-seat="{{ $seat }}"
-        {{ $occupied ? 'disabled' : '' }}
+                // 3. Lógica de valores
+                selected = button.dataset.row + button.dataset.seat;
+                text.textContent = selected;
+                document.getElementById('seatRow').value = button.dataset.row;
+                document.getElementById('seatNumber').value = button.dataset.seat;
 
-        class="seat w-14 h-14 rounded-lg font-bold transition
-        {{ $occupied
-            ? 'bg-red-500 text-white cursor-not-allowed'
-            : 'bg-gray-200 hover:bg-emerald-500 hover:text-white'
-        }}">
-
-        {{ $letter }}{{ $seat }}
-
-    </button>
-
-            @endfor
-
-        </div>
-
-
-    @endfor
-
-</div>
-<div class="mt-10 text-center">
-
-    <h3 class="font-bold text-lg">
-        Asiento seleccionado:
-    </h3>
-
-    <p
-        id="selectedSeat"
-        class="text-emerald-600 text-xl font-black mt-2">
-        Ninguno
-    </p>
-
-<form
-    method="POST"
-    action="{{ route('events.register', $event->id) }}"
-    class="mt-6">
-
-    @csrf
-
-    <input
-        type="hidden"
-        id="seatRow"
-        name="seat_row">
-
-    <input
-        type="hidden"
-        id="seatNumber"
-        name="seat_number">
-
-    <button
-        id="confirmButton"
-        disabled
-        class="px-8 py-3 rounded-xl bg-emerald-600 text-white font-bold opacity-50">
-
-        Confirmar inscripción
-
-    </button>
-
-</form>
-
-</div>
-
-</div> {{-- Se cierra la tarjeta blanca --}}
-
-</div> {{-- Se cierra el contenedor --}}
-
-<script>
-
-let selected = null;
-
-const buttons = document.querySelectorAll('.seat');
-console.log(buttons);
-
-const text = document.getElementById('selectedSeat');
-
-const confirm = document.getElementById('confirmButton');
-
-buttons.forEach(button => {
-
-    button.addEventListener('click', () => {
-
-        buttons.forEach(b => {
-
-            b.classList.remove(
-                'bg-emerald-600',
-                'text-white'
-            );
-
-            b.classList.add(
-                'bg-gray-200'
-            );
-
+                // 4. Habilitar botón de confirmación
+                confirm.disabled = false;
+            });
         });
-
-        button.classList.remove(
-            'bg-gray-200'
-        );
-
-        button.classList.add(
-            'bg-emerald-600',
-            'text-white'
-        );
-
-        selected =
-            button.dataset.row +
-            button.dataset.seat;
-
-        text.textContent = selected;
-        document.getElementById('seatRow').value =
-    button.dataset.row;
-
-document.getElementById('seatNumber').value =
-    button.dataset.seat;
-
-        confirm.disabled = false;
-
-        confirm.classList.remove(
-            'opacity-50'
-        );
-
-    });
-
-});
-
-</script>
-
+    </script>
 
 </x-app-layout>
