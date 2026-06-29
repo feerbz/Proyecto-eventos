@@ -8,10 +8,8 @@
 
     <div class="max-w-5xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
 
-        <!-- Contenedor Principal Dark Mode -->
         <div class="bg-white dark:bg-[#1e293b] rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 p-8 md:p-12">
 
-            <!-- Encabezado de la Tarjeta -->
             <div class="text-center mb-12">
                 <h2 class="text-3xl font-black text-slate-800 dark:text-white tracking-tight mb-3">
                     {{ $event->title }}
@@ -27,7 +25,6 @@
                 $rows = ceil($capacity / $columns);
             @endphp
 
-            <!-- Área del Escenario (Diseño Curvo Iluminado) -->
             <div class="max-w-2xl mx-auto mb-16 relative">
                 <div class="bg-gradient-to-b from-slate-800 to-[#1e293b] border-t-4 border-emerald-500 rounded-t-[100px] shadow-[0_-15px_40px_-10px_rgba(16,185,129,0.2)] text-center py-6">
                     <span class="text-emerald-500 font-black tracking-[0.3em] text-sm uppercase">
@@ -36,7 +33,6 @@
                 </div>
             </div>
 
-            <!-- Grid de Asientos con Scroll Horizontal en Móviles -->
             <div class="overflow-x-auto pb-8">
                 <div class="flex flex-col items-center gap-4 min-w-[600px]">
 
@@ -60,7 +56,7 @@
                                     {{ $occupied ? 'disabled' : '' }}
                                     class="seat relative w-12 h-12 md:w-14 md:h-14 rounded-t-2xl rounded-b-md font-bold text-sm md:text-base transition-all duration-200 border-b-4 flex items-center justify-center
                                     {{ $occupied
-                                        ? 'bg-slate-800 border-slate-900 text-slate-600 cursor-not-allowed opacity-60'
+                                        ? 'bg-red-500/80 border-red-700 text-white cursor-not-allowed opacity-60'
                                         : 'bg-slate-700 border-slate-800 text-slate-300 hover:bg-emerald-500 hover:border-emerald-700 hover:text-white hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/30 cursor-pointer'
                                     }}">
                                     {{ $letter }}{{ $seat }}
@@ -72,7 +68,6 @@
                 </div>
             </div>
 
-            <!-- Leyenda de Colores -->
             <div class="flex flex-wrap items-center justify-center gap-8 mt-4 border-t border-slate-200 dark:border-slate-800 pt-8 mb-10">
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 rounded-t-xl rounded-b-sm bg-slate-700 border-b-4 border-slate-800 shadow-sm"></div>
@@ -83,12 +78,11 @@
                     <span class="text-sm font-medium text-slate-600 dark:text-slate-400">Seleccionado</span>
                 </div>
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-t-xl rounded-b-sm bg-slate-800 border-b-4 border-slate-900 opacity-60"></div>
+                    <div class="w-8 h-8 rounded-t-xl rounded-b-sm bg-red-500/80 border-b-4 border-red-700 opacity-60"></div>
                     <span class="text-sm font-medium text-slate-600 dark:text-slate-400">Ocupado</span>
                 </div>
             </div>
 
-            <!-- Panel Inferior: Confirmación -->
             <div class="mt-8 bg-slate-50 dark:bg-[#1a2333] rounded-2xl p-8 border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6">
                 
                 <div class="text-center md:text-left">
